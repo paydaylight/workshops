@@ -134,18 +134,18 @@ workflows:
       - run_tests:
           filters:
             branches:
-              ignore: /main|releases|new_image/
+              ignore: /staging|production|new_image/
 
   deploy_to_staging:
     jobs:
       - deploy_to_staging:
           filters:
             branches:
-              only: main
+              only: staging
 
   deploy_to_production:
     jobs:
       - deploy_to_production:
           filters:
             branches:
-              only: releases
+              only: production
