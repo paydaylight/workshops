@@ -112,16 +112,22 @@ if [ "$RAILS_ENV" == "production" ]; then
    mkdir /home/app/workshops/tmp
    mkdir -p /home/app/workshops/vendor/cache
   fi
-  chown app:app -R /home/app/workshops
 
   echo
-  echo "Compiling Assets..."
+  echo "Compiling JS assets..."
   chmod 755 /home/app/workshops/node_modules
   su - app -c "cd /home/app/workshops; yarn install --latest"
   #su - app -c "cd /home/app/workshops; yarn upgrade"
-  su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
-  su - app -c "cd /home/app/workshops; yarn"
+  #su - app -c "cd /home/app/workshops; yarn"
 fi
+
+echo
+echo "Changing file permissions to app user..."
+chown app:app -R /home/app/workshops
+
+echo
+echo "Compiling Assets..."
+su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
 
 if [ "$APPLICATION_HOST" == "localhost" ]; then
   echo
