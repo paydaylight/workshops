@@ -45,14 +45,12 @@ RUN /usr/sbin/usermod -u 999 app
 
 ENV APP_HOME /home/app/workshops
 WORKDIR $APP_HOME
-RUN rm docker-compose.yml
 RUN chown app -R ./
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 
 EXPOSE 80 443
 ADD entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
-RUN rm entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
 RUN echo 'export PATH=./bin:$PATH:/usr/local/rvm/rubies/ruby-2.7.4/bin' >> /root/.bashrc
