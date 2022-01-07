@@ -1,11 +1,7 @@
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf9b50e035d4fd487209f3d177ba178)](https://www.codacy.com/gh/brentkearney/workshops/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brentkearney/workshops&amp;utm_campaign=Badge_Grade)
-
-
 # Workshops
 
-"Workshops" is software for managing scientific meetings, or small conferences. It is made with [Ruby on Rails](http://rubyonrails.org)
-and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations
-who host workshops. It is used at the
+"Workshops" is software for managing scientific meetings, or small conferences. It was created by [Brent Kearney](https://github.com/brentkearney/workshops) with [Ruby on Rails](http://rubyonrails.org)
+and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations who host workshops. It is used at the
 [Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
 
