@@ -38,9 +38,7 @@ lib/assets
 .env.db
 .env.web
 passenger.*
-Dockerfile
 docker-compose.yml
-entrypoint.sh
 Passengerfile.json
 nginx.conf.erb
 Capfile
