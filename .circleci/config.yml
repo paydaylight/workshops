@@ -52,11 +52,12 @@ jobs:
             PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres < setup.sql
             rm setup.sql
       - run:
-          name: Bundle install
+          name: Install Bundle, default settings
           command: |
             cd /home/app/workshops
             gem install bundler
             bundle install
+            bin/rake ws:init_settings
       - run:
           name: Run migrations
           command: |
