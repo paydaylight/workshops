@@ -55,6 +55,7 @@ jobs:
           name: Install Bundle, default settings
           command: |
             cd /home/app/workshops
+            echo "127.0.0.1 db" >> /etc/hosts
             gem install bundler
             bundle install
             bin/rake ws:init_settings
