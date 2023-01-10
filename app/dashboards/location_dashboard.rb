@@ -2,7 +2,7 @@
 
 require 'administrate/base_dashboard'
 
-class ScheduleDashboard < Administrate::BaseDashboard
+class LocationDashboard < Administrate::BaseDashboard
   # ATTRIBUTE_TYPES
   # a hash that describes the type of each of the model's fields.
   #
@@ -10,20 +10,11 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
-    event: Field::BelongsTo,
-    lecture: Field::BelongsTo,
     id: Field::Number,
-    start_time: Field::DateTime.with_options(format: '%Y-%m-%d @ %H:%M'),
-    end_time: Field::DateTime.with_options(format: '%H:%M'),
     name: Field::String,
-    description: Field::Text,
-    location: SelectLocationField.with_options(collection: Location.names),
-    updated_by: Field::String,
+    clarification: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
-    staff_item: Field::Boolean,
-    earliest: Field::DateTime,
-    latest: Field::DateTime,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -33,10 +24,8 @@ class ScheduleDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     id
-    event
     name
-    start_time
-    end_time
+    clarification
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -44,42 +33,33 @@ class ScheduleDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = %i[
     id
     name
-    event
-    lecture
-    start_time
-    end_time
-    name
-    description
-    location
-    updated_by
-    created_at
-    updated_at
-    staff_item
-    earliest
-    latest
+    clarification
   ].freeze
 
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
-    event
-    lecture
-    start_time
-    end_time
     name
-    description
-    location
-    updated_by
-    staff_item
-    earliest
-    latest
+    clarification
   ].freeze
 
-  # Overwrite this method to customize how schedules are displayed
+  # COLLECTION_FILTERS
+  # a hash that defines filters that can be used while searching via the search
+  # field of the dashboard.
+  #
+  # For example to add an option to search for open resources by typing "open:"
+  # in the search field:
+  #
+  #   COLLECTION_FILTERS = {
+  #     open: ->(resources) { resources.where(open: true) }
+  #   }.freeze
+  COLLECTION_FILTERS = {}.freeze
+
+  # Overwrite this method to customize how locations are displayed
   # across all pages of the admin dashboard.
   #
-  def display_resource(schedule)
-    schedule.start_time.strftime('%Y-%m-%d %H:%M').to_s
-  end
+  # def display_resource(location)
+  #   "Location ##{location.id}"
+  # end
 end
