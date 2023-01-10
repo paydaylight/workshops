@@ -25,36 +25,23 @@ config/newrelic.yml
 lib/tasks/birs.rake
 
 # organization-specific email templates
-app/views/participant_mailer/rsvp/BIRS/
-app/views/participant_mailer/rsvp/CMO/
-app/views/participant_mailer/rsvp/BIRS-JP/
-app/views/participant_mailer/rsvp/IASM/
-app/views/participant_mailer/rsvp/IMAG/
-app/views/participant_mailer/rsvp/UBCO/
-app/views/participant_mailer/rsvp/IAS-H/
-app/views/invitation_mailer/BIRS/
-app/views/invitation_mailer/CMO/
-app/views/invitation_mailer/IAS-H/
-app/views/invitation_mailer/BIRS-JP/
-app/views/invitation_mailer/EO/
-app/views/invitation_mailer/IASM/
-app/views/invitation_mailer/IMAG/
-app/views/invitation_mailer/UBCO/
+app/views/participant_mailer/rsvp/BIRS
+app/views/participant_mailer/rsvp/CMO
+app/views/participant_mailer/rsvp/IAS-H
+app/views/invitation_mailer/BIRS
+app/views/invitation_mailer/CMO
+app/views/invitation_mailer/IAS-H
 lib/assets
 
 # Deployment files
 .dockerignore
 .env.db
 .env.web
+.byebug_history
 passenger.*
 Dockerfile
-Dockerfile.old
-Dockerfile.bak
 docker-compose.yml
 entrypoint.sh
-entrypoint.sh-orig
-entrypoint.sh.bak
-entrypoint.sh.old
 Passengerfile.json
 nginx.conf.erb
 Capfile

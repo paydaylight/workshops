@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+# This file file will manage your custom env vars
+
+ENV['POSTGRES_USER'] = 'postgres'
+ENV['DB_USER'] = 'wsuser'
+ENV['DB_PASS'] = 'yyyyyyyyyyyyyyy'
+ENV['DB_HOST'] = 'localhost'
+ENV['DEVISE_SECRET_KEY='] = 'xxxxxxxxxxx'
+ENV['DEVISE_JWT_SECRET_KEY'] = 'xxxxxxxxxxx'
+ENV['DEVISE_PEPPER'] = xxxxxxxxxxx
+ENV['DEVISE_EMAIL'] = 'webmaster@example.com'
+ENV['LECTURES_API_KEY'] = 'xxxxxxxxxxx'
+ENV['APPLICATION_HOST'] = 'localhost'
+ENV['APPLICATION_PROTOCOL'] = 'http'
+ENV['EMAIL_SERVER'] = 'mail.example.com'
+ENV['EMAIL_PORT'] = 587
+ENV['EMAIL_STARTTLS'] = true
+ENV['MAILGUN_API_KEY'] = 'xxxxxxxxxxx'
+ENV['MAILGUN_EMAIL_DOMAIN'] = 'staging.example.com'
+ENV['CORS_HOSTS'] = "'https://locomotive.works', 'http://locomotive.works', 'https://www.example.com', 'http://www.example.com'"
