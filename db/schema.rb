@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_22_194013) do
+ActiveRecord::Schema.define(version: 2023_01_10_040000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,13 @@ ActiveRecord::Schema.define(version: 2021_07_22_194013) do
     t.boolean "is_recording", default: false
     t.index ["event_id"], name: "index_lectures_on_event_id"
     t.index ["person_id"], name: "index_lectures_on_person_id"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "clarification"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "memberships", id: :serial, force: :cascade do |t|
