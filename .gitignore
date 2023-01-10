@@ -37,6 +37,7 @@ lib/assets
 .dockerignore
 .env.db
 .env.web
+.byebug_history
 passenger.*
 Dockerfile
 docker-compose.yml
@@ -47,6 +48,7 @@ Capfile
 config/deploy.rb
 config/deploy/
 ssh-keys/
+config/initializers/custom_env.rb
 
 .idea
 app/views/memberships/old-new.html.erb

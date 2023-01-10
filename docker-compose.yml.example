@@ -47,6 +47,7 @@ services:
     environment:
       - DB_USER=wsuser
       - DB_PASS=yyyyyyyyyyyyyyy
+      - DB_HOST=db
       - RAILS_ENV=development
       - YARN_ENV=development
       - RAILS_SERVE_STATIC_FILES=true
