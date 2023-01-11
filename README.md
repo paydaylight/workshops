@@ -197,7 +197,7 @@ This installation method assumes Ruby + Rails are installed on your local machin
 
 9.  Set environment variables (refer to the end of `docker-compose.yml.example`).
 
-10.  Start the application
+10. Start the application
     `rails s # short for: rails server`
 
 11. Login to the web interface http://localhost:3000 with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
