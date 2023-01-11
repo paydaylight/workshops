@@ -13,6 +13,9 @@ describe 'Editing a Schedule Item', type: :feature do
 
   before do
     login_as user, scope: :user
+    create(:location, name: 'Room 1')
+    create(:location, name: 'Room 2')
+    create(:location, name: 'Room 3')
   end
 
   after(:each) do
@@ -67,7 +70,7 @@ describe 'Editing a Schedule Item', type: :feature do
       page.select new_start.strftime('%M'), from: 'schedule_start_time_5i'
       page.select new_stop.strftime('%H'), from: 'schedule_end_time_4i'
       page.select new_stop.strftime('%M'), from: 'schedule_end_time_5i'
-      page.fill_in 'schedule_location', with: 'Elsewhere'
+      page.select 'Room 1', from: 'schedule_location'
 
       click_button 'Update Schedule'
       expect(find('div.alert-warning').text)
@@ -142,9 +145,9 @@ describe 'Editing a Schedule Item', type: :feature do
       end
 
       it 'updates the location of the item' do
-        page.fill_in 'schedule_location', with: 'In the woods'
+        page.select 'Room 3', from: 'schedule_location'
         click_button 'Update Schedule'
-        expect(Schedule.find(@item.id).location).to eq('In the woods')
+        expect(Schedule.find(@item.id).location).to eq('Room 3')
       end
 
       context 'If the "change_similar" option is selected on update' do
@@ -193,14 +196,41 @@ describe 'Editing a Schedule Item', type: :feature do
         end
 
         it 'updates the locations of similar items' do
-          new_location = 'A better spot for this'
-          page.fill_in 'schedule_location', with: new_location
+          page.select 'Room 2', from: 'schedule_location'
           page.check('change_similar')
           click_button 'Update Schedule'
-          expect(Schedule.find(@item.id).location).to eq(new_location)
-          expect(Schedule.find(@item2.id).location).to eq(new_location)
-          expect(Schedule.find(@item3.id).location).to eq(new_location)
+          expect(Schedule.find(@item.id).location).to eq('Room 2')
+          expect(Schedule.find(@item2.id).location).to eq('Room 2')
+          expect(Schedule.find(@item3.id).location).to eq('Room 2')
         end
+      end
+    end
+
+    context 'when location entry changes' do
+      let(:location) { create(:location, name: 'Original location') }
+      let(:schedule) { @event.schedules.first }
+
+      before do
+        schedule.update_attribute(:name, location: location.name)
+      end
+
+      context 'when edited' do
+        before do
+          location.update_attribute(:name, 'Edited location')
+          visit event_schedule_edit_path(@event, schedule)
+        end
+
+        it('still shows previous value') { expect(page.has_select?('Location', selected: schedule.location)) }
+        it { expect(schedule.location).not_to eq(location.reload) }
+      end
+
+      context 'when deleted' do
+        before do
+          location.delete
+          visit event_schedule_edit_path(@event, schedule)
+        end
+
+        it('still shows previous value') { expect(page.has_field?('Location', with: 'Original location')) }
       end
     end
   end

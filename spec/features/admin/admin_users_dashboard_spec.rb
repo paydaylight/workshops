@@ -26,9 +26,9 @@ describe 'Users Admin Dashboard', type: :feature do
       visit 'admin/users'
     end
 
-    it "should redirect to sign_in" do
+    it 'should redirect to sign_in' do
       expect(page).to have_current_path(sign_in_path)
-      expect(page).to have_content("You need to sign in or sign up before continuing")
+      expect(page).to have_content('You need to sign in or sign up before continuing')
     end
   end
 
@@ -38,9 +38,9 @@ describe 'Users Admin Dashboard', type: :feature do
       visit 'admin/users'
     end
 
-    it "should redirect to root path" do
+    it 'should redirect to root path' do
       expect(current_path).to eq(events_future_path).or eq(root_path)
-      expect(page).to have_content("Access denied")
+      expect(page).to have_content('Access denied')
     end
   end
 
@@ -50,9 +50,9 @@ describe 'Users Admin Dashboard', type: :feature do
       visit 'admin/users'
     end
 
-    it "should redirect to root path" do
+    it 'should redirect to root path' do
       expect(page).to have_current_path(admin_people_path)
-      expect(page).to have_content("Access denied")
+      expect(page).to have_content('Access denied')
     end
   end
 
@@ -62,7 +62,7 @@ describe 'Users Admin Dashboard', type: :feature do
       visit 'admin/users'
     end
 
-    it "should display admin lectures dashboard" do
+    it 'should display admin lectures dashboard' do
       expect(page).to have_current_path(admin_users_path)
     end
   end
@@ -73,7 +73,7 @@ describe 'Users Admin Dashboard', type: :feature do
       visit 'admin/users'
     end
 
-    it "should display admin lectures dashboard" do
+    it 'should display admin lectures dashboard' do
       expect(page).to have_current_path(admin_users_path)
     end
   end

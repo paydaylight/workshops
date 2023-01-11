@@ -8,8 +8,8 @@ require 'rails_helper'
 
 describe 'Lectures Admin Dashboard', type: :feature do
   before do
-  	@event = create(:event)
-  	person = create(:person)
+    @event = create(:event)
+    person = create(:person)
   	create(:membership, event: @event, person: person, role: 'Organizer')
 
   	@member_user = create(:user,email: person.email,person: person, role: 0)

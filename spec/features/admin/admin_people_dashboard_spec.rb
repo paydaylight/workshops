@@ -8,11 +8,11 @@ require 'rails_helper'
 
 describe 'People Admin Dashboard', type: :feature do
   before do
-  	@event = create(:event)
-  	person = create(:person)
-  	create(:membership, event: @event, person: person, role: 'Organizer')
+    @event = create(:event)
+    person = create(:person)
+    create(:membership, event: @event, person: person, role: 'Organizer')
 
-  	@member_user = create(:user,email: person.email,person: person, role: 0)
+    @member_user = create(:user, email: person.email, person: person, role: 0)
     @staff_user = create(:user, :staff)
     @admin_user = create(:user, :admin)
     @super_admin_user = create(:user, :super_admin)
@@ -27,9 +27,9 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to sing_in" do
+    it 'should redirect to sing_in' do
       expect(page).to have_current_path(sign_in_path)
-      expect(page).to have_content("You need to sign in or sign up before continuing")
+      expect(page).to have_content('You need to sign in or sign up before continuing')
     end
   end
 
@@ -39,9 +39,9 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should redirect to root path" do
+    it 'should redirect to root path' do
       expect(current_path).to eq(events_future_path).or eq(root_path)
-      expect(page).to have_content("Access denied")
+      expect(page).to have_content('Access denied')
     end
   end
 
@@ -51,7 +51,7 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should display admin people dashboard" do
+    it 'should display admin people dashboard' do
       expect(page).to have_current_path(admin_people_path)
     end
   end
@@ -62,7 +62,7 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should display admin people dashboard" do
+    it 'should display admin people dashboard' do
       expect(page).to have_current_path(admin_people_path)
     end
   end
@@ -73,7 +73,7 @@ describe 'People Admin Dashboard', type: :feature do
       visit 'admin/people'
     end
 
-    it "should display admin people dashboard" do
+    it 'should display admin people dashboard' do
       expect(page).to have_current_path(admin_people_path)
     end
   end
