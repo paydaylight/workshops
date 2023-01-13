@@ -53,7 +53,7 @@ describe 'GetLectures' do
 
     before do
       @room = 'Empty'
-      @event = create(:event, start_date: Date.today, end_date: Date.today + 5.days)
+      @event = create(:event, start_date: Date.today, end_date: Time.zone.today + 5.days)
       travel_to @event.start_date_in_time_zone.change({ hour: 9 })
     end
 
