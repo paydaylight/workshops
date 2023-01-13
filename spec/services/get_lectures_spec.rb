@@ -6,7 +6,7 @@
 
 require 'rails_helper'
 
-describe "GetLectures" do
+describe 'GetLectures' do
   context '.initialize' do
     before do
       @event = add_lectures_on(Date.current)
@@ -49,22 +49,27 @@ describe "GetLectures" do
   end
 
   context '.current' do
+    include ActiveSupport::Testing::TimeHelpers
+
     before do
       @room = 'Empty'
-      @event = create(:event, start_date: Date.today,
-                                end_date: Date.today + 5.days)
+      @event = create(:event, start_date: Date.today, end_date: Date.today + 5.days)
+      travel_to @event.start_date_in_time_zone.change({ hour: 9 })
+    end
+
+    after do
+      travel_back
     end
 
     it 'returns the lecture closest to the current time' do
       start_time = Time.current - 1.hour
       end_time = start_time + 30.minutes
-      create(:lecture, event: @event, start_time: start_time,
-                    end_time: end_time, room: @room)
-      create(:lecture, event: @event, start_time: start_time + 2.hours,
-                    end_time: end_time + 2.hours, room: @room)
-      lecture = create(:lecture, event: @event, room: @room,
-                           start_time: Time.current - 10.minutes,
-                           end_time: Time.current + 20.minutes)
+      create(:lecture, event: @event, start_time: start_time, end_time: end_time, room: @room)
+      create(:lecture, event: @event, start_time: start_time + 2.hours, end_time: end_time + 2.hours, room: @room)
+      lecture = create(:lecture,
+                       event: @event, room: @room,
+                       start_time: Time.current - 10.minutes,
+                       end_time: Time.current + 20.minutes)
 
       gl = GetLectures.new(@room)
       expect(gl.current).to eq(lecture)

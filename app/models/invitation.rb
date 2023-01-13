@@ -105,13 +105,10 @@ class Invitation < ApplicationRecord
 
   def update_times
     self.invited_on = DateTime.current
-    if self.membership.event.online? || self.membership.virtual?
-      self.expires = event.end_date.to_time
-                          .in_time_zone(event.time_zone)
-                          .end_of_day
+    if membership.event.online? || membership.virtual?
+      self.expires = event.end_date_in_time_zone.end_of_day
     else
-      start_time = event.start_date.to_time
-                        .in_time_zone(event.time_zone).beginning_of_day
+      start_time = event.start_date_in_time_zone.beginning_of_day
       self.expires = start_time - EXPIRES_BEFORE
     end
   end
