@@ -8,8 +8,8 @@ FactoryBot.define do
     person { association :person }
 
     f.title
-    f.start_time { (event.start_date + 1.days).to_time.in_time_zone(event.time_zone).change({ hour:9, min:0}) }
-    f.end_time { (event.start_date + 1.days).to_time.in_time_zone(event.time_zone).change({ hour:10, min:0}) }
+    f.start_time { (event.start_date + 1.days).in_time_zone(event.time_zone).change({ hour: 9, min: 0 }) }
+    f.end_time { (event.start_date + 1.days).in_time_zone(event.time_zone).change({ hour: 10, min: 0 }) }
     f.room { 'TCPL 201' }
     f.do_not_publish { false }
     f.abstract { Faker::Lorem.sentence(word_count: 2) }

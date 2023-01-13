@@ -12,9 +12,7 @@ RSpec.describe ScheduleController, type: :controller do
     authenticate_for_controllers
     build_schedule_template(@event.event_type)
 
-    start_time = (@event.start_date + 1.days)
-                 .to_time.in_time_zone(@event.time_zone)
-                 .change(hour: 9, min: 0)
+    start_time = (@event.start_date + 1.days).in_time_zone(@event.time_zone).change(hour: 9, min: 0)
     end_time = start_time.change(hour: 9, min: 30)
     @valid_attributes = attributes_for(:schedule, event_id: @event.id,
                                                   start_time: start_time,
@@ -39,9 +37,7 @@ RSpec.describe ScheduleController, type: :controller do
       before do
         sign_out @user
         (9..16).each do |hour|
-          start_time = (@event.start_date + 1.days)
-                       .to_time.in_time_zone(@event.time_zone)
-                       .change(hour: hour, min: 0)
+          start_time = (@event.start_date + 1.days).in_time_zone(@event.time_zone).change(hour: hour, min: 0)
           end_time = start_time.change(hour: hour, min: 30)
           name = "Schedule Item at #{hour}"
           create(:schedule, event: @event, start_time: start_time,
@@ -142,11 +138,9 @@ RSpec.describe ScheduleController, type: :controller do
       @membership.role = 'Organizer'
       @membership.save
 
-      start_time = (@event.start_date + 1.days).to_time
-                    .in_time_zone(@event.time_zone).change(hour: 9, min: 0)
+      start_time = (@event.start_date + 1.days).in_time_zone(@event.time_zone).change(hour: 9, min: 0)
       end_time = start_time.change(hour: 9, min: 30)
-      schedule = create(:schedule, event: @event,
-                                   start_time: start_time, end_time: end_time)
+      schedule = create(:schedule, event: @event, start_time: start_time, end_time: end_time)
 
       get :edit, params: { event_id: @event.id, id: schedule.to_param }
       expect(assigns(:schedule)).to eq(schedule)
@@ -564,8 +558,8 @@ RSpec.describe ScheduleController, type: :controller do
       speaker = create(:membership, event: @event).person
       talk = create(:lecture, event: @event, person: speaker,
                       title: 'Test talk', room: 'Online',
-                 start_time: DateTime.now.change({ hour:12, min:0}),
-                   end_time:  DateTime.now.change({ hour:12, min:30}))
+                 start_time: DateTime.current.change({ hour:12, min:0}),
+                   end_time:  DateTime.current.change({ hour:12, min:30}))
 
       @schedule_item = create(:schedule, event: @event, lecture: talk,
                               name: talk.title, location: talk.room,
@@ -612,8 +606,8 @@ RSpec.describe ScheduleController, type: :controller do
 
       context 'on a day other than today' do
         it 'denies access' do
-          @schedule_item.start_time = DateTime.now.tomorrow.change({ hour:12, min:0})
-          @schedule_item.end_time = DateTime.now.tomorrow.change({ hour:12, min:30})
+          @schedule_item.start_time = DateTime.current.tomorrow.change({ hour: 12, min: 0})
+          @schedule_item.end_time = DateTime.current.tomorrow.change({ hour: 12, min: 30})
           @schedule_item.save
 
           post :recording, params: @start_params

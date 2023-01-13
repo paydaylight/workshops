@@ -130,9 +130,7 @@ describe 'EventMaillist' do
       hour = 8
       event2.attendance('Confirmed').sample(speaker_count).each do |speaker|
         hour += 1
-        start_time = (event2.start_date + 1.days).to_time
-                            .in_time_zone(event2.time_zone)
-                            .change({ hour: hour, min:0})
+        start_time = (event2.start_date + 1.days).in_time_zone(event2.time_zone).change({ hour: hour, min:0})
         end_time = start_time + 45.minutes
         create(:lecture, person: speaker.person, event: event2,
                          start_time: start_time, end_time: end_time)

@@ -107,11 +107,10 @@ FactoryBot.define do
       after(:create) do |event|
         9.upto(12) do |t|
           create(:schedule,
-            event: event,
-            name: "Item at #{t}",
-            start_time: (event.start_date + 2.days).to_time.change({ hour: t }),
-            end_time: (event.start_date + 2.days).to_time.change({ hour: t+1 })
-          )
+                 event: event,
+                 name: "Item at #{t}",
+                 start_time: (event.start_date + 2.days).in_time_zone(event.time_zone).change({ hour: t }),
+                 end_time: (event.start_date + 2.days).in_time_zone(event.time_zone).change({ hour: t + 1 }))
         end
       end
     end

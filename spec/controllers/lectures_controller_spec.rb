@@ -94,8 +94,7 @@ RSpec.describe LecturesController, type: :controller do
       @event = create(:event, start_date: start_date, end_date: end_date)
       start_time = Time.now + 2.hours
       end_time = start_time + 40.minutes
-      @lecture = create(:lecture, event: @event, start_time: start_time,
-                               end_time: end_time)
+      @lecture = create(:lecture, event: @event, start_time: start_time, end_time: end_time)
       @room = @lecture.room
     end
 
