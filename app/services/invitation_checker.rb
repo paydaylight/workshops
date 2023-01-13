@@ -105,7 +105,7 @@ class InvitationChecker
 
     # some invitations were sent before the invitee was Virtual
     if invitation.membership.role.match?('Virtual')
-      invitation.expires = invitation.event.end_date.to_time.end_of_day
+      invitation.expires = invitation.event.end_date.end_of_day
       invitation.save
     end
 

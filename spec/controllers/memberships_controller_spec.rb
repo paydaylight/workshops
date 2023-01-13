@@ -1009,10 +1009,8 @@ RSpec.describe MembershipsController, type: :controller do
             @event.max_virtual = @event.num_invited_virtual
             @event.save
 
-            member = create(:membership, attendance: 'Not Yet Invited',
-                                               role: 'Observer')
-            post :invite, params: { event_id: @event.id, invite_members_form:
-                      { "#{member.id}": "1" } }
+            member = create(:membership, attendance: 'Not Yet Invited', role: 'Observer')
+            post :invite, params: { event_id: @event.id, invite_members_form: { "#{member.id}": "1" } }
 
             expect(flash[:success]).to be_present
             updated_member = Membership.find(member.id)
