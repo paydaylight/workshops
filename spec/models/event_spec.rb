@@ -14,7 +14,7 @@ RSpec.describe "Model validations: Event ", type: :model do
 
   it 'factory produces legitimate start and end dates' do
     event = build(:event)
-    expect(event.start_date.to_time.to_i).to be < event.end_date.to_time.to_i
+    expect(event.start_date).to be < event.end_date
   end
 
   it 'is invalid without a name' do

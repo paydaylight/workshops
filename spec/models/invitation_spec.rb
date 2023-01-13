@@ -45,8 +45,7 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     i = create(:invitation, membership: membership)
 
     duration = Invitation.duration_setting
-    start_date = event.start_date.to_time
-                      .in_time_zone(event.time_zone).beginning_of_day
+    start_date = event.start_date_in_time_zone.beginning_of_day
 
     expect(i.expires).to eq(start_date - duration)
   end
@@ -56,7 +55,7 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     membership = build(:membership, event: event)
     i = create(:invitation, membership: membership)
 
-    end_time = event.end_date.to_time.end_of_day.in_time_zone(event.time_zone)
+    end_time = event.end_date.end_of_day.in_time_zone(event.time_zone)
     expect(i.expires).to eq(end_time)
   end
 
@@ -66,7 +65,7 @@ RSpec.describe 'Model validations: Invitation', type: :model do
     membership = build(:membership, event: event, role: 'Virtual Participant')
     i = create(:invitation, membership: membership)
 
-    end_time = event.end_date.to_time.end_of_day.in_time_zone(event.time_zone)
+    end_time = event.end_date.end_of_day.in_time_zone(event.time_zone)
     expect(i.expires).to eq(end_time)
   end
 
@@ -113,9 +112,8 @@ RSpec.describe 'Model validations: Invitation', type: :model do
       reminders = invitation.membership.invite_reminders
       expect(reminders).not_to be_empty
       expect(reminders.values.last).to eq('FactoryBot')
-
       reminded_on = reminders.keys.first.strftime("%Y-%m-%d %H:%M")
-      expect(reminded_on).to eq(DateTime.now.strftime("%Y-%m-%d %H:%M"))
+      expect(reminded_on).to eq(DateTime.current.strftime("%Y-%m-%d %H:%M"))
     end
 
     it 'sets the mailer template' do

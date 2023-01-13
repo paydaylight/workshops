@@ -63,8 +63,8 @@ class ScheduleItem
     unless new_day.nil?
       the_date = { year: new_day.to_date.year, month: new_day.to_date.month,
                    day: new_day.to_date.mday }
-      new_schedule.start_time = new_schedule.start_time.to_time.change(the_date)
-      new_schedule.end_time = new_schedule.end_time.to_time.change(the_date)
+      new_schedule.start_time = new_schedule.start_time.change(the_date)
+      new_schedule.end_time = new_schedule.end_time.change(the_date)
     end
     [new_schedule, the_date]
   end
@@ -222,8 +222,7 @@ class ScheduleItem
 
   def set_default_start_time
     phour, pminute = most_popular_start_time.split(':')
-    start_time = @schedule.start_time.to_time.in_time_zone(@event.time_zone)
-                          .change({ hour: phour, min: pminute })
+    start_time = @schedule.start_time_in_time_zone.change({ hour: phour, min: pminute })
 
     unless @todays_schedule.empty?
       todays_lectures = @todays_schedule.select {|s| s unless s.lecture_id.nil? }

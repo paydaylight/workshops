@@ -105,9 +105,7 @@ describe Api::V1::LecturesController, type: :request do
       before do
         allow_any_instance_of(Api::V1::LecturesController).to receive(:authenticated?).and_return(true)
         allow_any_instance_of(Api::V1::BaseController).to receive(:authenticate_user_from_token!).and_return(true)
-        start_time = (@event.start_date + 1.days).to_time
-                                               .in_time_zone(@event.time_zone)
-                                               .change({ hour:11, min:0})
+        start_time = (@event.start_date + 1.days).in_time_zone(@event.time_zone).change({ hour: 11, min: 0 })
         end_time = start_time + 1.hour
         3.times do
           lecture = create(:lecture, event: @event, start_time: start_time, end_time: end_time)
@@ -124,7 +122,7 @@ describe Api::V1::LecturesController, type: :request do
           json = JSON.parse(response.body)
 
           Lecture.all.each do |lecture|
-            record = json.detect {|item| item['lecture']['id'].to_i == lecture.id }
+            record = json.detect { |item| item['lecture']['id'].to_i == lecture.id }
             expect(record['lecture']['title']).to eq(lecture.title)
             expect(record['lecture']['event_format']).to eq(lecture.event.event_format)
             expect(record['lecture']['event_location']).to eq(lecture.event.location)
@@ -166,7 +164,8 @@ describe Api::V1::LecturesController, type: :request do
           json = JSON.parse(response.body)
 
           Lecture.all.each do |lecture|
-            record = json.detect {|item| item['lecture']['id'].to_i == lecture.id }
+            record = json.detect { |item| item['lecture']['id'].to_i == lecture.id }
+
             expect(record['lecture']['title']).to eq(lecture.title)
             expect(record['lecture']['event_format']).to eq(lecture.event.event_format)
             expect(record['lecture']['event_location']).to eq(lecture.event.location)
