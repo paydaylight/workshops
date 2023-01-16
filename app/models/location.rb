@@ -12,13 +12,9 @@ class Location < ApplicationRecord
 
   validates :name, presence: true
 
-  scope :include_id, ->(id = nil) { id ? where(id: id).or(kept).distinct : kept }
-
-  def self.names
-    all.pluck(:name)
-  end
+  scope :including_id, ->(id = nil) { id ? where(id: id).or(kept).distinct : kept }
 
   def self.names_and_ids(id: nil)
-    include_id(id).pluck(:name, :id)
+    including_id(id).pluck(:name, :id)
   end
 end

@@ -8,7 +8,7 @@ class BelongsToLocation < Administrate::Field::BelongsTo
   private
 
   def candidate_resources
-    scope = Location.include_id(data)
+    scope = Location.including_id(data)
 
     order = options.delete(:order)
     order ? scope.reorder(order) : scope
