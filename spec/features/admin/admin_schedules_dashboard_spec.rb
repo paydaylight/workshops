@@ -47,7 +47,7 @@ RSpec.describe 'Admin Schedules Dashboard', type: :feature do
   end
 
   context 'when location changes' do
-    let(:schedule) { create(:schedule, location: location.name) }
+    let(:schedule) { create(:schedule, location: location) }
     let(:location) { create(:location, name: 'Old location') }
 
     before { schedule }
@@ -58,13 +58,12 @@ RSpec.describe 'Admin Schedules Dashboard', type: :feature do
         visit edit_admin_schedule_path(schedule.id)
       end
 
-      it('still shows previous value') { expect(page.has_select?('Location', selected: schedule.location)) }
-      it { expect(schedule.location).not_to eq(location.reload) }
+      it { expect(page.has_select?('Location', selected: 'New location')) }
     end
 
     context 'when deleted' do
       before do
-        location.delete
+        location.discard
         visit edit_admin_schedule_path(schedule.id)
       end
 

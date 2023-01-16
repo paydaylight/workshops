@@ -5,7 +5,7 @@ FactoryBot.define do
     event { association :event }
 
     f.name { 'FactoryBot reserves a spot on the schedule!' }
-    f.location { 'TCPL 201' }
+    f.location { association :location, name: 'TCPL 201' }
     f.description { Faker::Lorem.sentence(word_count: 4) }
     f.updated_by { 'FactoryBot' }
     f.start_time { (event.start_date + 1.days).in_time_zone(event.time_zone).change({ hour: 9, min: 0 }) }
