@@ -132,7 +132,7 @@
     <div class="row">
       <div class="col form-group">
         <%= f.label :location %>:
-        <%= f.select :location, location_select_options(f.object.location), {selected: f.object.location}, {class: 'form-control'} %>
+        <%= f.select :location_id, Location.names_and_ids(id: f.object.id), {selected: f.object.location_id}, {class: 'form-control'} %>
       </div>
     </div>
 

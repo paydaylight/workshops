@@ -8,9 +8,17 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 class Location < ApplicationRecord
+  include Discard::Model
+
   validates :name, presence: true
 
+  scope :include_id, ->(id = nil) { id ? where(id: id).or(kept).distinct : kept }
+
   def self.names
-    find_each.pluck(:name)
+    all.pluck(:name)
+  end
+
+  def self.names_and_ids(id: nil)
+    include_id(id).pluck(:name, :id)
   end
 end

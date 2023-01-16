@@ -210,7 +210,7 @@ class ScheduleController < ApplicationController
   def schedule_params
     params.require(:schedule)
           .permit(:id, :event_id, :start_time, :end_time, :earliest, :latest,
-                  :name, :description, :location, :day, :staff_item, :updated_by,
+                  :name, :description, :location_id, :day, :staff_item, :updated_by,
                   lecture_attributes: [:person_id, :id, :keywords,
                                        :do_not_publish])
   end

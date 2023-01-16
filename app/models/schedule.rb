@@ -9,13 +9,14 @@
 class Schedule < ApplicationRecord
   belongs_to :event
   belongs_to :lecture, optional: true
+  belongs_to :location
   accepts_nested_attributes_for :lecture
   attr_accessor :day
   attr_accessor :flash_notice
 
   before_save :clean_data, :strip_html
 
-  validates :event, :location, :updated_by, presence: true
+  validates :event, :updated_by, presence: true
   validates_associated :lecture, allow_nil: true
   validates :name, presence: true
   validates :start_time, :end_time, presence: true
@@ -70,7 +71,7 @@ class Schedule < ApplicationRecord
   end
 
   def overlaps_message(other)
-    "“#{other.name}” in #{other.location} @
+    "“#{other.name}” in #{other.location.name} @
     #{other.start_time.strftime('%H:%M')} -
      #{other.end_time.strftime('%H:%M')}".squish
   end
@@ -79,7 +80,7 @@ class Schedule < ApplicationRecord
     return unless other.event_id == self.event_id
     self.flash_notice = { warning: '' } if flash_notice.blank?
     unless flash_notice[:warning].include? 'overlaps with'
-      msg = "<p>#{name} (#{location}) @ #{start_time.strftime('%H:%M')} - "
+      msg = "<p>#{name} (#{location.name}) @ #{start_time.strftime('%H:%M')} - "
       msg << "#{end_time.strftime('%H:%M')}\" overlaps with these items:</p>\n"
       flash_notice[:warning] << msg.squish
     end

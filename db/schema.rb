@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_01_10_040000) do
+ActiveRecord::Schema.define(version: 2023_01_13_122057) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,8 +108,10 @@ ActiveRecord::Schema.define(version: 2023_01_10_040000) do
   create_table "locations", force: :cascade do |t|
     t.string "name", null: false
     t.string "clarification"
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_locations_on_discarded_at"
   end
 
   create_table "memberships", id: :serial, force: :cascade do |t|
@@ -186,14 +188,16 @@ ActiveRecord::Schema.define(version: 2023_01_10_040000) do
     t.datetime "end_time"
     t.string "name"
     t.text "description"
-    t.string "location"
+    t.string "location_name"
     t.string "updated_by"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "staff_item", default: false, null: false
     t.datetime "earliest"
     t.datetime "latest"
+    t.bigint "location_id"
     t.index ["event_id"], name: "index_schedules_on_event_id"
+    t.index ["location_id"], name: "index_schedules_on_location_id"
   end
 
   create_table "sentmails", force: :cascade do |t|
@@ -275,4 +279,5 @@ ActiveRecord::Schema.define(version: 2023_01_10_040000) do
   add_foreign_key "memberships", "events"
   add_foreign_key "memberships", "people"
   add_foreign_key "schedules", "events"
+  add_foreign_key "schedules", "locations"
 end
