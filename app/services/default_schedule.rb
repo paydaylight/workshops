@@ -28,7 +28,7 @@ class DefaultSchedule
 
   def only_default_entries
     defaults = @schedules.select { |s| s.updated_by == 'Default Schedule' }
-    @event.schedules.destroy_all if (@schedules - defaults).empty?
+    @event.reload.schedules.destroy_all if (@schedules - defaults).empty?
   end
 
   def build_default_schedule

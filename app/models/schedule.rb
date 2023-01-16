@@ -9,7 +9,7 @@
 class Schedule < ApplicationRecord
   belongs_to :event
   belongs_to :lecture, optional: true
-  belongs_to :location, optional: true
+  belongs_to :location
   accepts_nested_attributes_for :lecture
   attr_accessor :day
   attr_accessor :flash_notice

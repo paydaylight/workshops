@@ -7,6 +7,8 @@
 require 'rails_helper'
 
 RSpec.describe ScheduleController, type: :controller do
+  let(:location) { create(:location) }
+  
   before do
     # sets @user, @person, @event, @membership
     authenticate_for_controllers
@@ -15,9 +17,9 @@ RSpec.describe ScheduleController, type: :controller do
     start_time = (@event.start_date + 1.days).in_time_zone(@event.time_zone).change(hour: 9, min: 0)
     end_time = start_time.change(hour: 9, min: 30)
     @valid_attributes = attributes_for(:schedule, event_id: @event.id,
+                                                  location_id: location.id,
                                                   start_time: start_time,
-                                                  end_time: end_time)
-                        .merge(new_item: true)
+                                                  end_time: end_time).merge(new_item: true)
 
     @invalid_attributes = attributes_for(:schedule, event_id: @event.id,
                                                     name: '',
@@ -180,7 +182,7 @@ RSpec.describe ScheduleController, type: :controller do
           .and_return(true)
         ActionMailer::Base.deliveries.clear
 
-        post :create, params: { event_id: @event.id, schedule: @valid_attributes }
+        post :create, params: { event_id: @event.id, schedule: @valid_attributes, day: Date.today.to_s }
         expect(EmailStaffScheduleNoticeJob).to have_received(:perform_later)
       end
     end
@@ -208,8 +210,9 @@ RSpec.describe ScheduleController, type: :controller do
     end
 
     context 'with valid params' do
+      let(:location) { create(:location, name: 'Back of the bus') }
       let(:new_attributes) {
-        @valid_attributes.merge(name: 'A new name', location: 'Back of the bus')
+        @valid_attributes.merge(name: 'A new name', location_id: location.id)
       }
 
       before do
@@ -224,7 +227,7 @@ RSpec.describe ScheduleController, type: :controller do
         schedule = Schedule.find(@schedule.id)
 
         expect(schedule.name).to eq('A new name')
-        expect(schedule.location).to eq('Back of the bus')
+        expect(schedule.location.name).to eq('Back of the bus')
         expect(schedule.updated_by).to eq(@user.name)
       end
 
@@ -559,10 +562,11 @@ RSpec.describe ScheduleController, type: :controller do
       talk = create(:lecture, event: @event, person: speaker,
                       title: 'Test talk', room: 'Online',
                  start_time: DateTime.current.change({ hour:12, min:0}),
-                   end_time:  DateTime.current.change({ hour:12, min:30}))
+                    end_time:  DateTime.current.change({ hour:12, min:30}))
+      location = create(:location, name: talk.room)
 
       @schedule_item = create(:schedule, event: @event, lecture: talk,
-                              name: talk.title, location: talk.room,
+                              name: talk.title, location: location,
                         start_time: talk.start_time,
                           end_time: talk.end_time)
 

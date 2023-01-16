@@ -18,7 +18,7 @@ describe "ScheduleItem" do
           end_time: second_day_at(10,00),
               name: 'Good morning!',
        description: 'The first item of the day.',
-          location: 'TCPL 201',
+          location: create(:location, name: 'TCPL 201'),
         updated_by: "RSpec"
     }
     @new_params = {
@@ -70,7 +70,7 @@ describe "ScheduleItem" do
 
       item = ScheduleItem.new(@new_params.merge(event_id: @event.id)).schedule
 
-      expect(item.location).to eq('New Room')
+      expect(item.location.name).to eq('New Room')
     end
 
     it 'creates a valid schedule item without associated lecture item' do

@@ -147,7 +147,7 @@ describe 'Editing a Schedule Item', type: :feature do
       it 'updates the location of the item' do
         page.select 'Room 3', from: 'schedule_location_id'
         click_button 'Update Schedule'
-        expect(Schedule.find(@item.id).location.name).to eq('Room 3')
+        expect(Schedule.find_by(name: @item.name).location.name).to eq('Room 3')
       end
 
       context 'If the "change_similar" option is selected on update' do
@@ -190,9 +190,9 @@ describe 'Editing a Schedule Item', type: :feature do
           page.fill_in 'schedule_description', with: newer_description
           page.check('change_similar')
           click_button 'Update Schedule'
-          expect(Schedule.find(@item.id).description).to eq(newer_description)
-          expect(Schedule.find(@item2.id).description).to eq(newer_description)
-          expect(Schedule.find(@item3.id).description).to eq(newer_description)
+          expect(Schedule.find_by(name: @item.name).description).to eq(newer_description)
+          expect(Schedule.find_by(name: @item2.name).description).to eq(newer_description)
+          expect(Schedule.find_by(name: @item3.name).description).to eq(newer_description)
         end
 
         it 'updates the locations of similar items' do

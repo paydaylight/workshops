@@ -8,29 +8,29 @@ module ScheduleHelpers
   extend ActiveSupport::Concern
 
   def notify_staff?
-    event_memo.current?
+    event.current?
   end
 
   def start_time_in_time_zone
-    event_memo&.time_zone ? start_time.in_time_zone(event_memo.time_zone) : start_time
+    event&.time_zone ? start_time.in_time_zone(event.time_zone) : start_time
   end
 
   def end_time_in_time_zone
-    event_memo&.time_zone ? end_time.in_time_zone(event_memo.time_zone) : end_time
+    event&.time_zone ? end_time.in_time_zone(event.time_zone) : end_time
   end
 
   def times_use_event_timezone
-    unless start_time.nil? || end_time.nil? || event_memo.nil?
-      start_time.time_zone.name == event_memo.time_zone &&
-          end_time.time_zone.name == event_memo.time_zone
+    unless start_time.nil? || end_time.nil? || event.nil?
+      start_time.time_zone.name == event.time_zone &&
+          end_time.time_zone.name == event.time_zone
     end
   end
 
   def times_within_event
     schedule_start = start_time_in_time_zone.to_i
     schedule_end = end_time_in_time_zone.to_i
-    event_start = event_memo.start_date_in_time_zone.to_i
-    event_end = event_memo.end_date_in_time_zone.change({ hour: 23 }).to_i
+    event_start = event.start_date_in_time_zone.to_i
+    event_end = event.end_date_in_time_zone.change({ hour: 23 }).to_i
     if schedule_start < event_start || schedule_start > event_end
       errors.add(:start_time, '- must be within the event dates')
     end
@@ -39,7 +39,7 @@ module ScheduleHelpers
   end
 
   def missing_data
-    event_memo.blank? || start_time.blank? || end_time.blank?
+    event.blank? || start_time.blank? || end_time.blank?
   end
 
   def ends_after_begins
@@ -66,9 +66,5 @@ module ScheduleHelpers
   def clean_data
     # remove leading & trailing whitespace
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
-  end
-
-  def event_memo
-    @even_memo ||= event
   end
 end
