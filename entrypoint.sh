@@ -1,10 +1,14 @@
 #!/bin/bash
 set -e
 
+source /etc/profile.d/rvm.sh
+
 echo
 echo "Welcome to OS:"
 uname -v
 cat /etc/issue
+sed -i -e 's/mesg n .*true/tty -s \&\& mesg n/g' ~/.profile
+
 
 echo
 echo "Setting system timezone..."
@@ -15,18 +19,6 @@ debconf-set-selections /tmp/tz.txt
 rm /etc/timezone
 rm /etc/localtime
 dpkg-reconfigure --frontend noninteractive tzdata
-
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.4 ]; then
-  echo
-  echo "Create gemset..."
-  gpg --keyserver keys.openpgp.org --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-  /usr/bin/curl -sSL https://get.rvm.io | bash -s stable
-  bash -lc 'rvm --default use ruby-2.7.4'
-  /usr/local/rvm/bin/rvm gemset create ruby-2.7.4
-  /usr/local/rvm/bin/rvm gemset use ruby-2.7.4@global
-  /usr/local/rvm/bin/rvm cleanup all
-  /usr/local/rvm/bin/rvm reload
-fi
 
 echo
 echo "Ruby version:"
@@ -42,99 +34,82 @@ yarn --version
 
 echo
 echo "Installing latest bundler..."
-/usr/local/rvm/bin/rvm-exec 2.7.4 gem install bundler
+/usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
+# /usr/local/rvm/bin/rvm-exec 2.7.7 bundle _2.1.4_ update --bundler
+# /usr/local/rvm/bin/rvm-exec 2.7.7 gem update --system
+# /usr/local/rvm/bin/rvm-exec 2.7.7 gem install rubygems-bundler
 
-if [ ! -e /usr/local/rvm/gems/ruby-2.7.4/gems/rails-5.2.4.6 ]; then
-  echo
-  echo "Installing Rails 5.2.4.6..."
-  su - app -c "cd /home/app/workshops; /usr/local/rvm/bin/rvm-exec 2.7.4 gem install rails -v 5.2.4.6"
-fi
-
-if [ ! -e /home/app/workshops/bin ]; then
-  echo
-  echo "Starting new rails app..."
-  su - app -c "cd /home/app; rails new workshops"
-
-  echo
-  echo "Bundle install..."
-  RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.4 bundle install
-
-  echo
-  echo "Adding default Settings..."
-  rake ws:init_settings
-
-  echo
-  echo "Creating admins..."
-  if [ -e lib/tasks/birs.rake ]; then
-    rake birs:create_admin RAILS_ENV=development
-  else
-    rake ws:create_admins RAILS_ENV=development
-  fi
-fi
+# when updating Rails
+# echo
+# echo "Bundle update rails..."
+# RAILS_ENV=production /usr/local/rvm/bin/rvm-exec 2.7.7 bundle update rails
 
 
 echo
-echo "Bundle update..."
-RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.4 bundle update
+echo "Bundle install..."
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.7 bundle install
 
+# updates gems to latest minor versions
+# echo
+# echo "Bundle update..."
+# RAILS_ENV=production /usr/local/rvm/bin/rvm-exec 2.7.7 bundle update
 
-root_owned_files=`find /usr/local/rvm/gems -user root -print`
-if [ -z "$root_owned_files" ]; then
+if [ ! -d "${GEM_HOME}/gems" ]; then
   echo
-  echo "Changing gems to non-root file permissions..."
-  chown app:app -R /usr/local/rvm/gems
+  echo "Gems not found in $GEM_HOME!"
+  echo
+  exit
 fi
 
-if [ -e /home/app/workshops/db/migrate ]; then
-  echo
-  echo "Running migrations..."
-  cd /home/app/workshops
-  SECRET_KEY_BASE=token DB_USER=$DB_USER DB_PASS=$DB_PASS
-  rake db:migrate RAILS_ENV=production
-  rake db:migrate RAILS_ENV=development
-  rake db:migrate RAILS_ENV=test
-fi
+echo
+echo "Changing to non-root file permissions..."
+chown app:app -R /usr/local/rvm/gems
+
+# # Default settings
+# echo
+# echo "Adding default Settings..."
+# rake ws:init_settings
+
+# echo
+# echo "Creating admins..."
+# if [ -e lib/tasks/birs.rake ]; then
+#   rake birs:create_admin RAILS_ENV=production
+# else
+#   rake ws:create_admins RAILS_ENV=production
+# fi
+
+echo
+echo "Running migrations..."
+#rake db:migrate RAILS_ENV=production
+RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.7 bundle exec rails db:migrate
+
+# only used in dev environments
+# rake db:migrate RAILS_ENV=test
 
 echo
 echo "Checking for WebPacker..."
 if [ ! -e /home/app/workshops/bin/webpack ]; then
   echo "Installing webpacker..."
-  RAILS_ENV=development bundle exec rails webpacker:install
+  RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.7 bundle exec rails webpacker:install
   echo "Done!"
   echo
 fi
 
-if [ "$RAILS_ENV" == "production" ]; then
-  echo
-  echo "Changing to non-root file permissions..."
-  chown app:app -R /usr/local/rvm/gems
-  if [ ! -e /home/app/workshops/tmp ]; then
-   mkdir /home/app/workshops/tmp
-   mkdir -p /home/app/workshops/vendor/cache
-  fi
-
-  echo
-  echo "Compiling JS assets..."
-  chmod 755 /home/app/workshops/node_modules
-  su - app -c "cd /home/app/workshops; yarn install --latest"
-  #su - app -c "cd /home/app/workshops; yarn upgrade"
-  #su - app -c "cd /home/app/workshops; yarn"
+if [ ! -e /home/app/workshops/tmp ]; then
+  mkdir /home/app/workshops/tmp
+  mkdir -p /home/app/workshops/vendor/cache
 fi
-
-echo
-echo "Changing file permissions to app user..."
 chown app:app -R /home/app/workshops
 
 echo
 echo "Compiling Assets..."
+su - app -c "cd /home/app/workshops; yarn install" # --latest"
 su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
-
-if [ "$APPLICATION_HOST" == "localhost" ]; then
-  echo
-  echo "Launching webpack-dev-server..."
-  su - app -c "ruby /home/app/workshops/bin/webpack-dev-server &"
-fi
+su - app -c "cd /home/app/workshops; yarn"
 
 echo
+echo "Launching webpack-dev-server..."
+su - app -c "ruby /home/app/workshops/bin/webpack-dev-server &"
+echo
 echo "Starting web server..."
-bundle exec passenger start #--min-instances 2
+/usr/local/rvm/bin/rvm-exec 2.7.7 bundle exec passenger start --min-instances 2
