@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'activerecord-session_store'
-gem "administrate", ">= 0.13.0"
+gem "administrate", "~> 0.16.0"
 gem 'bcrypt'
 gem 'bootsnap'
 gem 'bootstrap', '~> 4.5.0'

@@ -35,24 +35,10 @@ yarn --version
 echo
 echo "Installing latest bundler..."
 /usr/local/rvm/bin/rvm-exec 2.7.7 gem install bundler
-# /usr/local/rvm/bin/rvm-exec 2.7.7 bundle _2.1.4_ update --bundler
-# /usr/local/rvm/bin/rvm-exec 2.7.7 gem update --system
-# /usr/local/rvm/bin/rvm-exec 2.7.7 gem install rubygems-bundler
-
-# when updating Rails
-# echo
-# echo "Bundle update rails..."
-# RAILS_ENV=production /usr/local/rvm/bin/rvm-exec 2.7.7 bundle update rails
-
 
 echo
 echo "Bundle install..."
 RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.7 bundle install
-
-# updates gems to latest minor versions
-# echo
-# echo "Bundle update..."
-# RAILS_ENV=production /usr/local/rvm/bin/rvm-exec 2.7.7 bundle update
 
 if [ ! -d "${GEM_HOME}/gems" ]; then
   echo
@@ -65,26 +51,9 @@ echo
 echo "Changing to non-root file permissions..."
 chown app:app -R /usr/local/rvm/gems
 
-# # Default settings
-# echo
-# echo "Adding default Settings..."
-# rake ws:init_settings
-
-# echo
-# echo "Creating admins..."
-# if [ -e lib/tasks/birs.rake ]; then
-#   rake birs:create_admin RAILS_ENV=production
-# else
-#   rake ws:create_admins RAILS_ENV=production
-# fi
-
 echo
 echo "Running migrations..."
-#rake db:migrate RAILS_ENV=production
 RAILS_ENV=development /usr/local/rvm/bin/rvm-exec 2.7.7 bundle exec rails db:migrate
-
-# only used in dev environments
-# rake db:migrate RAILS_ENV=test
 
 echo
 echo "Checking for WebPacker..."
@@ -103,7 +72,7 @@ chown app:app -R /home/app/workshops
 
 echo
 echo "Compiling Assets..."
-su - app -c "cd /home/app/workshops; yarn install" # --latest"
+su - app -c "cd /home/app/workshops; yarn install"
 su - app -c "cd /home/app/workshops; RAILS_ENV=development SECRET_KEY_BASE=token bundle exec rake assets:precompile --trace"
 su - app -c "cd /home/app/workshops; yarn"
 
