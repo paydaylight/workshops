@@ -123,10 +123,6 @@ class EventPolicy
     organizers_and_staff
   end
 
-  def admin?
-    staff_and_admins
-  end
-
   private
 
   def staff_at_location
