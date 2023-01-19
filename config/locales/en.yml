@@ -30,4 +30,29 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  ui:
+    flash:
+      empty_event_members: Event has no members
+      invalid_date_range: Invalid dates
+  event_report:
+    event_code: Event code
+    default_fields:
+      attendance: Attendance
+      role: Role
+      name: Name
+      email: Email
+      arriving_on: Arriving on
+      departing_on: Departing on
+      has_guests: Has guests?
+      number_of_guests: Number of guests
+      billing: Billing
+      special_info: Special info
+    optional_fields:
+      affiliation: Affiliation
+      department: Department
+      academic_status: Academic status
+      year_of_phd: Year of PHD
+      organizer_notes: Organizer notes
+      gender: Gender
+      research_areas: Research areas
+      title: Title

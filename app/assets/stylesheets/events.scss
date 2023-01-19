@@ -71,6 +71,10 @@
   }
 }
 
+.spaced {
+  margin-top: 2rem;
+}
+
 table#events-list {
   tr.cancelled {
     color: $cancelled-events-link-color;
