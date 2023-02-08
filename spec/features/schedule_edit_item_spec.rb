@@ -67,7 +67,7 @@ describe 'Editing a Schedule Item', type: :feature do
       page.select new_start.strftime('%M'), from: 'schedule_start_time_5i'
       page.select new_stop.strftime('%H'), from: 'schedule_end_time_4i'
       page.select new_stop.strftime('%M'), from: 'schedule_end_time_5i'
-      page.fill_in 'schedule_location', with: 'Elsewhere'
+      page.select 'Room 1', from: 'schedule_location'
 
       click_button 'Update Schedule'
       expect(find('div.alert-warning').text)
@@ -142,9 +142,9 @@ describe 'Editing a Schedule Item', type: :feature do
       end
 
       it 'updates the location of the item' do
-        page.fill_in 'schedule_location', with: 'In the woods'
+        page.select 'Room 2', from: 'schedule_location'
         click_button 'Update Schedule'
-        expect(Schedule.find(@item.id).location).to eq('In the woods')
+        expect(Schedule.find(@item.id).location).to eq('Room 2')
       end
 
       context 'If the "change_similar" option is selected on update' do
@@ -193,8 +193,8 @@ describe 'Editing a Schedule Item', type: :feature do
         end
 
         it 'updates the locations of similar items' do
-          new_location = 'A better spot for this'
-          page.fill_in 'schedule_location', with: new_location
+          new_location = 'Room 3'
+          page.select new_location, from: 'schedule_location'
           page.check('change_similar')
           click_button 'Update Schedule'
           expect(Schedule.find(@item.id).location).to eq(new_location)
