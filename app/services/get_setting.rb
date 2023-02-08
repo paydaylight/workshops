@@ -124,7 +124,12 @@ class GetSetting
     return [] unless location_name
 
     rooms = location(location_name, 'rooms') || []
-    rooms.gsub(/^\[|"|'|\]$/, '').split(',').map(&:strip) if rooms.is_a?(String)
+
+    if rooms.is_a?(String)
+      rooms.gsub(/^\[|"|'|\]$/, '').split(',').map(&:strip)
+    else
+      rooms
+    end
   end
 
   def self.default_location
