@@ -7,9 +7,9 @@ def build_lecture_schedule(event = nil)
 
   @event.days.each do |eday|
     (9..12).each do |hour|
-      start_time = eday.to_time.in_time_zone(@event.time_zone)
+      start_time = eday.in_time_zone(@event.time_zone)
                        .change(hour: hour, min: 0)
-      end_time = eday.to_time.in_time_zone(@event.time_zone)
+      end_time = eday.in_time_zone(@event.time_zone)
                  .change(hour: hour, min: 30)
       lecture_title = "Lecture at #{hour}"
       create(:lecture, event: @event, start_time: start_time,
@@ -22,10 +22,8 @@ end
 def add_lectures_on(date, room = 'A room')
   event = create(:event, start_date: date - 1.day)
   (9..12).each do |hour|
-    start_time = date.to_time.in_time_zone(event.time_zone)
-                     .change(hour: hour, min: 0)
-    end_time = date.to_time.in_time_zone(event.time_zone)
-               .change(hour: hour, min: 30)
+    start_time = date.in_time_zone(event.time_zone).change(hour: hour, min: 0)
+    end_time = date.in_time_zone(event.time_zone).change(hour: hour, min: 30)
     lecture_title = "Lecture at #{hour}"
     create(:lecture, event: event, start_time: start_time, end_time: end_time,
                      title: lecture_title, room: room)

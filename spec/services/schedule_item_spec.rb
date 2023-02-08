@@ -43,7 +43,7 @@ describe "ScheduleItem" do
   end
 
   def event_timezone_at(hour, min)
-    @event.start_date.to_time.in_time_zone(@event.time_zone).change({ hour: hour, min: min})
+    @event.start_date_in_time_zone.change({ hour: hour, min: min})
   end
 
   it '.new' do

@@ -178,7 +178,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         delivery = ActionMailer::Base.deliveries.first
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-        rsvp_date = @event.end_date.to_time.strftime('%B %-d, %Y')
+        rsvp_date = @event.end_date.strftime('%B %-d, %Y')
         expect(body).to have_text("before #{rsvp_date}")
       end
     end
@@ -195,7 +195,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         delivery = ActionMailer::Base.deliveries.first
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
-        rsvp_date = @event.end_date.to_time.strftime('%B %-d, %Y')
+        rsvp_date = @event.end_date.strftime('%B %-d, %Y')
         expect(body).to have_text("before #{rsvp_date}")
       end
 

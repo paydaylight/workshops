@@ -11,11 +11,19 @@ module EventDecorators
     start_date.strftime('%Y')
   end
 
+  def start_date_in_time_zone
+    start_date.in_time_zone(time_zone)
+  end
+
+  def end_date_in_time_zone
+    end_date.in_time_zone(time_zone)
+  end
+
   def days
-    day = start_date.to_time.in_time_zone(time_zone).beginning_of_day
+    day = start_date_in_time_zone.beginning_of_day
     days = [day]
     # Compare date strings so TZ issues don't interfere
-    end_of_ws = end_date.to_time.in_time_zone(time_zone).end_of_day
+    end_of_ws = end_date_in_time_zone.end_of_day
     datestring = end_of_ws.strftime('%Y%m%d').to_s
     until day.strftime('%Y%m%d').to_s == datestring
       day += 1.day

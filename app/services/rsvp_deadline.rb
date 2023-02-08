@@ -24,9 +24,9 @@
 class RsvpDeadline
   def initialize(event, sent_on = DateTime.current, membership = false)
     @event = event
-    @start_date = event.start_date.to_time.in_time_zone(event.time_zone)
-    @end_date = event.end_date.to_time.in_time_zone(event.time_zone)
-    @sent_on = sent_on.to_time.in_time_zone(event.time_zone)
+    @start_date = event.start_date_in_time_zone
+    @end_date = event.end_date_in_time_zone
+    @sent_on = sent_on.in_time_zone(event.time_zone)
     @membership = membership || Membership.new(role: 'Virtual Participant')
   end
 
