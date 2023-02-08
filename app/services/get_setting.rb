@@ -120,6 +120,13 @@ class GetSetting
     Setting.Locations[location]['Country']
   end
 
+  def self.location_rooms(location_name)
+    return [] unless location_name
+
+    rooms = location(location_name, 'rooms') || []
+    rooms.gsub(/^\[|"|'|\]$/, '').split(',').map(&:strip) if rooms.is_a?(String)
+  end
+
   def self.default_location
     Setting.Locations.first.first
   end
