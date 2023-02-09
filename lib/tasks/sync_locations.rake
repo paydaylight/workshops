@@ -36,7 +36,7 @@ namespace :sync_locations do
   end
 
   def yml_path
-    @yml_path ||= Rails.root.join('lib', 'assets', 'locations.yml')
+    @yml_path ||= Rails.root.join('config', 'locations.yml')
   end
 
   desc 'Makes sure that default locations and rooms are up to date'
