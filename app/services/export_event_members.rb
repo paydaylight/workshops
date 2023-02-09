@@ -21,48 +21,64 @@ class ExportEventMembers
     @options = options
   end
 
-  def call
+  def call(to: :csv)
     return Result.new(error_message: I18n.t('ui.error_messages.no_options_selected')) if empty_fields?
 
-    csv = to_csv
-
-    Result.new(report: csv)
+    case to
+    when :csv
+      Result.new(report: to_csv)
+    when :table
+      Result.new(report: to_table)
+    else
+      Result.new(error_message: I18n.t('ui.flash.something_went_wrong'))
+    end
   end
 
   private
 
   attr_reader :event_ids, :options
 
-  def events
-    Event.where(id: event_ids).find_each
-  end
-
   def to_csv
     CSV.generate(headers: true) do |csv|
       csv << headers
-      events.each do |event|
-        memberships_by_attendance(event).each do |attendance, memberships|
-          next unless include_attendance?(attendance)
-          next unless include_event_format?(event.event_format)
+      process do |event, attendance, memberships|
+        next unless include_attendance?(attendance)
+        next unless include_event_format?(event.event_format)
 
-          memberships.each do |membership|
-            next unless include_roles?(membership.role)
+        memberships.each do |membership|
+          next unless include_roles?(membership.role)
 
-            csv << row(membership)
-          end
+          csv << row(membership)
         end
       end
     end
   end
 
-  def headers
-    selected_options.map do |field|
-      if DEFAULT_FIELDS.include?(field)
-        I18n.t("event_report.default_fields.#{field}")
-      else
-        I18n.t("event_report.optional_fields.#{field}")
+  def to_table
+    table = EventTable.new(headers: headers, values: [])
+    process do |_, _, memberships|
+      memberships.each do |membership|
+        table.values << row(membership)
       end
     end
+
+    table
+  end
+
+  def process
+    events.each do |event|
+      memberships_by_attendance(event).each do |attendance, memberships|
+        yield event, attendance, memberships
+      end
+    end
+  end
+
+  def events
+    Event.where(id: event_ids).find_each
+  end
+
+  def headers
+    fields(selected_options)
   end
 
   def selected_options

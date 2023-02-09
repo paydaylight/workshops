@@ -39,7 +39,7 @@
         </div>
       </div>
     <% end %>
-    <% if @show_datepicker %>
+    <% if @date_range_form %>
       <div class="card">
         <div class="card-body">
           <h4 class="form-label">Period</h4>
@@ -60,6 +60,7 @@
     <% end %>
       <div class="col-12 spaced" style="padding-left: 0;">
         <%= f.submit 'Get report', class: 'btn btn-primary', disabled: @disable_inputs, data: { disable_with: false } %>
+        <%= f.submit 'See summary', class: 'btn btn-info', disabled: @disable_inputs, data: { disable_with: false }, formaction: event_summary_path(@event), formmethod: :get unless @date_range_form %>
       </div>
   </div>
 <% end %>

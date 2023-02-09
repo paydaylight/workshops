@@ -45,8 +45,8 @@ Rails.application.routes.draw do
   get 'events/year/:year(/location/:location)' => 'events#year', as: :events_year
   get 'events/location/:location(/year/:year)' => 'events#location', as: :events_location
   get 'events/kind/:kind(/year/:year)' => 'events#kind', as: :events_kind
-  get '/events/reports' => 'reports#select_events', as: :events_report
-  post '/events/reports' => 'reports#export_in_range', as: :events_generate_report
+  get '/events/reports' => 'reports#select_events_form', as: :events_report
+  post '/events/reports' => 'reports#export_events', as: :events_generate_report
 
   resources :events do
     get 'schedule/new/:day' => 'schedule#new', as: :schedule_day
@@ -55,7 +55,8 @@ Rails.application.routes.draw do
     post 'schedule/create' => 'schedule#create'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     post 'schedule/:id/recording/:record_action' => 'schedule#recording', as: :recording
-    get 'report' => 'reports#current_event', as: :report
+    get 'report' => 'reports#event_form', as: :report
+    get 'summary' => 'reports#summary', as: :summary
     post 'report' => 'reports#export', as: :generate_report
     resources :schedule
     resources :memberships do

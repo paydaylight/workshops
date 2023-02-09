@@ -14,6 +14,20 @@ module EventMembersPresenter
   ROLES = I18n.t('memberships.roles').keys
   EVENT_FORMATS = I18n.t('events.formats').keys
 
+  EventTable = Struct.new(:headers, :values, keyword_init: true)
+
+  def fields(keys = ALL_FIELDS)
+    keys.map { |key| header(key) }
+  end
+
+  def header(key)
+    if DEFAULT_FIELDS.include?(key)
+      I18n.t("event_report.default_fields.#{key}", locale: :en)
+    else
+      I18n.t("event_report.optional_fields.#{key}", locale: :en)
+    end
+  end
+
   def cell_field_values
     @cell_field_values ||= {
       event_format: ->(mem) { mem.event.event_format },
