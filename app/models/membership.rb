@@ -40,8 +40,8 @@ class Membership < ApplicationRecord
 
   ROLES = ['Contact Organizer', 'Organizer', 'Virtual Organizer', 'Participant',
            'Virtual Participant', 'Observer', 'Backup Participant'].freeze
-  ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited',
-                'Declined'].freeze
+  ATTENDANCE = ['Confirmed', 'Invited', 'Undecided', 'Not Yet Invited', 'Declined'].freeze
+
 
   include SharedDecorators
 

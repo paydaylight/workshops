@@ -143,7 +143,7 @@ class GetSetting
   end
 
   def self.grant_list
-    Setting.Site['grant_list']
+    Setting.Site['grant_list'] || []
   end
 
   # Emails set in Settings.Site
