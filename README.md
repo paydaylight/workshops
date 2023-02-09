@@ -101,7 +101,7 @@ Installation instructions are below.
 
 The application is setup to work in a [Docker](http://www.docker.com) container.
 
-1.  Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
+1.  Clone the repository: `git clone https://github.com/birs-math/workshops.git`
 
 2.  Copy the example config files, and customize them to suit your needs. These include:
     ```
