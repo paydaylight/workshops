@@ -1,0 +1,5 @@
+Event code,Attendance,Name,Email,Department,Year of PHD
+23w999,Confirmed,John Doe,person-1@example.com,IT,0
+23w999,Invited,John Doe,person-2@example.com,IT,0
+23w999,Not Yet Invited,John Doe,person-3@example.com,IT,0
+23w999,Declined,John Doe,person-4@example.com,IT,0

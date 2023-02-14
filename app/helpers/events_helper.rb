@@ -47,6 +47,8 @@ module EventsHelper
     if !@kind.blank?
       title = "#{@kind.titleize.pluralize}"
       title += " in #{@year}" unless @year.blank?
+    elsif request.path.match(/reports/)
+      title = 'Generate Events Report'
     else
       title << " Events"
     end
