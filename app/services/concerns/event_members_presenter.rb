@@ -13,8 +13,13 @@ module EventMembersPresenter
   ATTENDANCE_TYPES = I18n.t('memberships.attendance').keys
   ROLES = I18n.t('memberships.roles').keys
   EVENT_FORMATS = I18n.t('events.formats').keys
+  EVENT_FIELDS = %i[event_format event_type event_code event_location event_name event_subjects].freeze
 
-  EventTable = Struct.new(:headers, :values, keyword_init: true)
+  EventTable = Struct.new(:headers, keyword_init: true) do
+    def values
+      @values ||= {}
+    end
+  end
 
   def fields(keys = ALL_FIELDS)
     keys.map { |key| header(key) }

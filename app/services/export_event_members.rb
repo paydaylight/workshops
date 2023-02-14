@@ -55,10 +55,10 @@ class ExportEventMembers
   end
 
   def to_table
-    table = EventTable.new(headers: headers, values: [])
+    table = EventTable.new(headers: headers)
     process do |_, _, memberships|
       memberships.each do |membership|
-        table.values << row(membership)
+        table.values[membership.id] = row(membership)
       end
     end
 
