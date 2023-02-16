@@ -215,8 +215,8 @@ RSpec.describe 'Reports', type: :feature do
         click_on 'Event Summary'
       end
 
-      it 'shows all fields except event fields' do
-        (EventMembersPresenter::ALL_FIELDS - EventMembersPresenter::EVENT_FIELDS).each do |field|
+      it 'shows summary fields' do
+        EventMembersPresenter::SUMMARY_FIELDS.each do |field|
           expect(page).to have_text(key_to_header(field))
         end
       end

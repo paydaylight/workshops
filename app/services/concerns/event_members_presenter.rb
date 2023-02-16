@@ -13,7 +13,8 @@ module EventMembersPresenter
   ATTENDANCE_TYPES = I18n.t('memberships.attendance').keys
   ROLES = I18n.t('memberships.roles').keys
   EVENT_FORMATS = I18n.t('events.formats').keys
-  EVENT_FIELDS = %i[event_format event_type event_code event_location event_name event_subjects].freeze
+  SUMMARY_FIELDS = %i[name affiliation email attendance role arriving_on departing_on
+                      gender has_guests number_of_guests billing special_info].freeze
 
   EventTable = Struct.new(:headers, keyword_init: true) do
     def values

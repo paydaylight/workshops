@@ -23,7 +23,7 @@ class ReportsController < ApplicationController
   def summary
     authorize @event, :generate_report?
 
-    result = ExportEventMembers.new(event_ids: [@event.id], options: summary_params).call(to: :table)
+    result = ExportEventMembers.new(event_ids: [@event.id], options: summary_options).call(to: :table)
 
     if result.valid?
       @report = result.report
@@ -91,15 +91,8 @@ class ReportsController < ApplicationController
     )
   end
 
-  def summary_params
-    params.permit(
-      *(
-        EventMembersPresenter::ALL_FIELDS +
-          EventMembersPresenter::ATTENDANCE_TYPES +
-          EventMembersPresenter::ROLES -
-          EventMembersPresenter::EVENT_FIELDS
-      )
-    )
+  def summary_options
+    @summary_options ||= EventMembersPresenter::SUMMARY_FIELDS.map { |field| [field, '1'] }.to_h
   end
 
   def set_defaults

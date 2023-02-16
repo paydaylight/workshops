@@ -67,7 +67,7 @@
     <li class="nav-second-level">
       <%= link_to '<i class="fa fa-list-alt fa-fw"></i>
       <span class="app-menu__label"> Event Summary</span>'.html_safe,
-                  event_summary_path(@event, **summary_all_options), id: 'summary-reports',
+                  event_summary_path(@event), id: 'summary-reports',
                   class: 'app-menu__item' %>
     </li>
     <% end %>
