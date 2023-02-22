@@ -1,0 +1,2 @@
+<h3><%= I18n.t('ui.email_notifications.new_template') %></h3>
+<%= render partial: 'single_email_form', locals: { email_notification: @email_notification, method: :post, delete_button: false } %>

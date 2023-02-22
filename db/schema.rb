@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_22_194013) do
+ActiveRecord::Schema.define(version: 2023_02_16_094649) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,17 @@ ActiveRecord::Schema.define(version: 2021_07_22_194013) do
     t.index ["replace_person_id"], name: "index_confirm_email_changes_on_replace_person_id"
     t.index ["replace_with_code"], name: "index_confirm_email_changes_on_replace_with_code"
     t.index ["replace_with_id"], name: "index_confirm_email_changes_on_replace_with_id"
+  end
+
+  create_table "email_notifications", force: :cascade do |t|
+    t.text "body", default: "", null: false
+    t.string "path", null: false
+    t.string "format", default: "html"
+    t.string "handler", null: false
+    t.boolean "default", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["path"], name: "index_email_notifications_on_path"
   end
 
   create_table "events", id: :serial, force: :cascade do |t|

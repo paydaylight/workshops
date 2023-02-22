@@ -1,0 +1,6 @@
+<% @email_notifications.each do |event_type, email_notifications| %>
+  <h3><%= event_type %></h3>
+  <% email_notifications.each do |email_notification| %>
+    <%= render partial: 'single_email_form', locals: { email_notification: email_notification, method: :put, delete_button: true } %>
+  <% end %>
+<% end %>

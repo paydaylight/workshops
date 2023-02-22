@@ -49,6 +49,8 @@ module EventsHelper
       title += " in #{@year}" unless @year.blank?
     elsif request.path.match(/reports/)
       title = 'Generate Events Report'
+    elsif request.path.match(/email_notifications/)
+      title = 'Email Notifications'
     else
       title << " Events"
     end

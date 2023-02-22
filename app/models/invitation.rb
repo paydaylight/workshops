@@ -113,6 +113,15 @@ class Invitation < ApplicationRecord
     end
   end
 
+  def email_template_path
+    InvitationEmailPathBuilder.build_path(
+      event_location: membership.event.location,
+      event_type: membership.event.event_type,
+      event_format: membership.event.event_format,
+      attendance: membership.attendance
+    )
+  end
+
   private
 
   def update_and_save

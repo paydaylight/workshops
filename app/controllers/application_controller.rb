@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from ActionController::InvalidAuthenticityToken, with: :invalid_auth_token
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ActiveRecord::RecordNotSaved, with: :record_not_saved
 
   # Authorization module
   include Pundit
@@ -44,6 +45,10 @@ class ApplicationController < ActionController::Base
 
   def record_not_found
     redirect_to events_future_path, error: 'Record not found.'
+  end
+
+  def record_not_saved
+    redirect_to :back, error: 'Something happened while saving record'
   end
 
   def authenticate_user!(*args)
