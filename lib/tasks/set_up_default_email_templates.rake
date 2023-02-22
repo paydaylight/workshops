@@ -7,7 +7,7 @@
 namespace :email_templates do
   desc 'Sets up default email invitation templates for each attendance status'
   task set_up_default: :environment do
-    Membership::ATTENDANCE.each do |status|
+    Membership::INVITATION_ATTENDANCE.each do |status|
       template = EmailNotification.find_or_initialize_by(
         handler: 'liquid',
         format: 'html',
