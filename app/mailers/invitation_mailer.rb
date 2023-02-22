@@ -19,47 +19,42 @@
 # SOFTWARE.
 
 class InvitationMailer < ApplicationMailer
+  prepend_view_path Liquid::Resolver.instance
+
   def invite(invitation)
+    @invitation = invitation
     @person = invitation.membership.person
     @event = invitation.membership.event
-    @rsvp_url = invitation.rsvp_url
-    @invitation_date = invitation.invited_on.strftime('%A, %B %-d, %Y')
-    @event_start = @event.start_date_formatted
-    @event_end = @event.end_date_formatted
-    @rsvp_deadline = RsvpDeadline.new(@event, DateTime.current,
-                                      invitation.membership).rsvp_by
-    @organizers = PersonWithAffilList.compose(@event.organizers)
 
-    location = @event.location
-    subject = "#{location} Workshop Invitation: #{@event.name} (#{@event.code})"
-
+    subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
     recipients = InvitationEmailRecipients.new(invitation).compose
-    templates = invitation.templates
-    return if templates.blank? # error report sent from the Invitation model
 
-    # Create PDF attachment
-    if File.exist?(templates['pdf_template_file'])
-      generator = PdfTemplateGenerator.new(location,
-                                           templates['pdf_template_file'])
-      attachments[templates['invitation_file']] = generator.pdf_file
-    end
-
-    headers['X-BIRS-Sender'] = "#{invitation.invited_by}"
-    headers['X-BIRS-Event'] = "#{invitation.event.code}"
+    headers['X-BIRS-Sender'] = invitation.invited_by.to_s
+    headers['X-BIRS-Event'] = invitation.event.code.to_s
     headers['X-Priority'] = 1
     headers['X-MSMail-Priority'] = 'High'
 
-    message = {
+    mail(
       to: recipients[:to],
       bcc: recipients[:bcc],
       from: recipients[:from],
       subject: subject,
-      template_path: templates['template_path'],
-      template_name: templates['template_name']
-    }
+      template_path: @invitation.email_template_path
+    )
+  end
 
-    mail(message) do |format|
-      format.text { render templates['text_template'] }
-    end
+  def liquid_context
+    {
+      'person_dear_name' => @person.dear_name,
+      'invitation_date' => @invitation.invited_on.strftime('%A, %B %-d, %Y'),
+      'event_name' => @event.name,
+      'event_location' => @event.location,
+      'event_code' => @event.code,
+      'rsvp_url' => @invitation.rsvp_url,
+      'rsvp_deadline' => RsvpDeadline.new(@event, DateTime.current, @invitation.membership).rsvp_by,
+      'event_start' => @event.start_date_formatted,
+      'event_end' => @event.end_date_formatted,
+      'organizers' => PersonWithAffilList.compose(@event.organizers)
+    }
   end
 end

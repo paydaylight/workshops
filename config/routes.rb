@@ -70,6 +70,14 @@ Rails.application.routes.draw do
     get 'lectures' => 'lectures#index'
   end
 
+  get 'email_notifications' => 'email_notifications#index'
+  scope path: 'email_notifications/:location/:attendance', as: :email_notification do
+    get '/' => 'email_notifications#show'
+    get 'new' => 'email_notifications#new'
+    match '/' => 'email_notifications#upsert', via: %i[put post]
+    delete '/destroy' => 'email_notifications#destroy'
+  end
+
   resources :settings
   post 'settings/delete' => 'settings#delete'
 

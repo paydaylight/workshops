@@ -31,12 +31,22 @@
 
 en:
   ui:
+    email_notifications:
+      new_template: New email template
+      add_template: Add template
+      delete_confirmation: Are you sure you want to delete template?
+    buttons:
+      update: Update
+      delete: Delete
     flash:
       empty_event_members: Event has no members
       invalid_date_range: Invalid dates
     error_messages:
       no_options_selected: Please select at least one option
   events:
+    format: Event format
+    type: Event type
+    location: Event location
     formats:
       hybrid: Hybrid
       physical: Physical
@@ -73,6 +83,7 @@ en:
       title: Title
       nserc_grant: NSERC grant
   memberships:
+    attendance_status: Attendance status
     attendance:
       confirmed: Confirmed
       invited: Invited
@@ -87,3 +98,5 @@ en:
       virtual_participant: Virtual Participant
       observer: Observer
       backup_participant: Backup Participant
+  email_notifications:
+    default: Default

@@ -1,0 +1,48 @@
+<div class="card mb-4">
+  <div class="card-body">
+    <%= form_for email_notification, url: email_notification_path(@current_location, @current_status), method: method do |f| %>
+      <%= f.hidden_field :id, value: email_notification.id %>
+      <div class="form-group row">
+        <%= f.label I18n.t('events.location'), class: 'col-sm-6 col-form-label' %>
+        <div class="col-sm-6">
+          <%= f.select :new_location, @locations.zip(@locations), { selected: email_notification.event_location || @current_location }, { class: 'custom-select', disabled: email_notification.default } %>
+        </div>
+      </div>
+      <div class="form-group row">
+        <%= f.label I18n.t('memberships.attendance_status'), class: 'col-sm-6 col-form-label' %>
+        <div class="col-sm-6">
+          <%= f.select :new_attendance, @attendance.zip(@attendance), { selected: email_notification.attendance || @current_status }, { class: 'custom-select', disabled: email_notification.default } %>
+        </div>
+      </div>
+      <% unless email_notification.default %>
+        <div class="form-group row">
+          <%= f.label I18n.t('events.type'), class: 'col-sm-6 col-form-label' %>
+          <div class="col-sm-6">
+            <%= f.select :new_event_type, @event_types.zip(@event_types), { selected: email_notification.event_type }, { class: 'custom-select' } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <%= f.label I18n.t('events.format'), class: 'col-sm-6 col-form-label' %>
+          <div class="col-sm-6">
+            <%= f.select :new_event_format, @event_formats.zip(@event_formats), { selected: email_notification.event_format }, { class: 'custom-select' } %>
+          </div>
+        </div>
+      <% end %>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-sm-12">
+          <%= f.text_area :body, value: email_notification.body, rows: 10, class: 'form-control' %>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col">
+          <%= f.submit I18n.t('ui.buttons.update'), class: 'btn btn-primary' %>
+          <% if delete_button && !email_notification.default %>
+            <%= link_to I18n.t('ui.buttons.delete'), email_notification_destroy_path(@current_location, @current_status, id: email_notification.id), method: :delete, class: 'btn btn-danger ml-2', data: { confirm: I18n.t('ui.email_notifications.delete_confirmation') } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
