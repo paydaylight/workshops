@@ -132,6 +132,12 @@
         events_report_path, id: 'select_events-reports', class: 'app-menu__item' %>
     </li>
     <% end %>
+      <% if policy(current_user).admin? %>
+        <li class="nav-item">
+          <%= link_to '<i class="fa fa-envelope fa-fw"></i><span class="app-menu__label">Email Notifications</span>'.html_safe,
+                      email_notifications_path, id: 'show-email_notifications', class: 'app-menu__item' %>
+        </li>
+      <% end %>
     <% end # end if @event else... %>
   </ul>
 </aside>
