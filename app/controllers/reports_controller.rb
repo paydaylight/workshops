@@ -6,16 +6,30 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 class ReportsController < ApplicationController
-  before_action :set_event, only: %i[current_event export]
-  before_action :set_defaults, only: %i[current_event select_events]
+  before_action :set_event, only: %i[event_form summary export]
+  before_action :set_defaults, only: %i[event_form select_events_form]
 
   # GET /events/:event_id/export
-  def current_event
+  def event_form
     authorize @event, :generate_report?
 
     if @event.memberships.count.zero?
       flash[:error] = I18n.t('ui.flash.empty_event_members')
       @disable_inputs = true
+    end
+  end
+
+  # GET /events/:event_id/summary
+  def summary
+    authorize @event, :generate_report?
+
+    result = ExportEventMembers.new(event_ids: [@event.id], options: summary_options).call(to: :table)
+
+    if result.valid?
+      @report = result.report
+    else
+      flash[:error] = result.error_message
+      redirect_to event_report_path(@event)
     end
   end
 
@@ -34,14 +48,14 @@ class ReportsController < ApplicationController
   end
 
   # GET /report
-  def select_events
+  def select_events_form
     authorize current_user, :admin?
 
-    @show_datepicker = true
+    @date_range_form = true
   end
 
   # POST /report
-  def export_in_range
+  def export_events
     authorize current_user, :admin?
 
     start_date = params[:start_date]
@@ -77,8 +91,12 @@ class ReportsController < ApplicationController
     )
   end
 
+  def summary_options
+    @summary_options ||= EventMembersPresenter::SUMMARY_FIELDS.map { |field| [field, '1'] }.to_h
+  end
+
   def set_defaults
     @disable_inputs = false
-    @show_datepicker = false
+    @date_range_form = false
   end
 end
