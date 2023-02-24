@@ -7,7 +7,7 @@ and released under the GPL-A open-source license. The software is intended to be
 [Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
 
-Contributions to the project are most welcome. Check out the [Project Page](https://github.com/brentkearney/workshops/projects/1) for whats happening in development now. If you would like to add features yourself, please
+Contributions to the project are most welcome. Check out the [Project Page](https://github.com/birs-math/workshops.git/projects/1) for whats happening in development now. If you would like to add features yourself, please
 [let me know](mailto:brentk@birs.ca), and/or submit a Pull Request. Or if you would like to pay for the development of additional features,
 please [contact me](mailto:brent@netmojo.ca).
 
@@ -99,7 +99,7 @@ Installation instructions are below.
 
 The application is setup to work in a [Docker](http://www.docker.com) container.
 
-1.  Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
+1.  Clone the repository: `git clone https://github.com/birs-math/workshops.git`
 
 2.  Copy the example config files, and customize them to suit your needs. These include:
     ```
@@ -149,7 +149,7 @@ It is currently configured to use [Sparkpost](https://www.sparkpost.com) for mai
 
 This installation method assumes Ruby + Rails are installed on your local machine, and uses SQLite3 for the database. YMMV :)
 
-1.  Clone the repository: `git clone https://github.com/brentkearney/workshops.git`
+1.  Clone the repository: `git clone https://github.com/birs-math/workshops.git`
 
 2.  Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
 

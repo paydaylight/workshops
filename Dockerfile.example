@@ -1,3 +1,4 @@
+
 # See: https://github.com/phusion/passenger-docker
 # Latest image versions: https://github.com/phusion/passenger-docker/blob/master/CHANGELOG.md
 FROM phusion/passenger-ruby27:2.4.1
@@ -22,6 +23,7 @@ RUN apt-get update -qq && apt-get dist-upgrade --yes && \
     apt-get install --yes pkg-config apt-utils build-essential cmake automake && \
     apt-get upgrade --fix-missing --yes --allow-remove-essential \
     -o Dpkg::Options::="--force-confold"
+
 
 # Update Node
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
@@ -58,6 +60,8 @@ COPY --chown=app:app \
  Gemfile.lock \
  package.json \
  yarn.lock \
+ Passengerfile.json \
+ nginx.conf.erb \
  Rakefile \
  config.ru \
  .rspec \
@@ -69,7 +73,7 @@ RUN touch $APP_HOME/config/app.yml
 RUN echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 RUN chown app -R ./
 
-EXPOSE 80 443
+EXPOSE 3000
 ADD entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
