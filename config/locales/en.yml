@@ -34,6 +34,7 @@ en:
     flash:
       empty_event_members: Event has no members
       invalid_date_range: Invalid dates
+      something_went_wrong: Something went wrong
     error_messages:
       no_options_selected: Please select at least one option
   events:

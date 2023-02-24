@@ -13,6 +13,26 @@ module EventMembersPresenter
   ATTENDANCE_TYPES = I18n.t('memberships.attendance').keys
   ROLES = I18n.t('memberships.roles').keys
   EVENT_FORMATS = I18n.t('events.formats').keys
+  SUMMARY_FIELDS = %i[name affiliation email attendance role arriving_on departing_on
+                      gender has_guests number_of_guests billing special_info].freeze
+
+  EventTable = Struct.new(:headers, keyword_init: true) do
+    def values
+      @values ||= {}
+    end
+  end
+
+  def fields(keys = ALL_FIELDS)
+    keys.map { |key| header(key) }
+  end
+
+  def header(key)
+    if DEFAULT_FIELDS.include?(key)
+      I18n.t("event_report.default_fields.#{key}", locale: :en)
+    else
+      I18n.t("event_report.optional_fields.#{key}", locale: :en)
+    end
+  end
 
   def cell_field_values
     @cell_field_values ||= {

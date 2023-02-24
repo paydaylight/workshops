@@ -123,6 +123,10 @@ class EventPolicy
     organizers_and_staff
   end
 
+  def see_summary?
+    organizers_and_staff
+  end
+
   private
 
   def staff_at_location

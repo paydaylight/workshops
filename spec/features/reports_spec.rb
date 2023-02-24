@@ -193,4 +193,48 @@ RSpec.describe 'Reports', type: :feature do
       end
     end
   end
+
+  describe 'events summary' do
+    let(:user) { admin }
+
+    before do
+      login_as user, scope: :user
+      visit event_report_path(event)
+    end
+
+    def key_to_header(key)
+      if EventMembersPresenter::DEFAULT_FIELDS.include?(key)
+        I18n.t("event_report.default_fields.#{key}", locale: :en)
+      else
+        I18n.t("event_report.optional_fields.#{key}", locale: :en)
+      end
+    end
+
+    context 'when navigating from sidebar' do
+      before do
+        click_on 'Event Summary'
+      end
+
+      it 'shows summary fields' do
+        EventMembersPresenter::SUMMARY_FIELDS.each do |field|
+          expect(page).to have_text(key_to_header(field))
+        end
+      end
+    end
+
+    context 'when submitting form' do
+      before do
+        click_on 'See summary'
+      end
+
+      let(:event_membership) { event.memberships.first }
+      let(:link) { first('.clickable-row')[:'data-href'] }
+
+      it('shows a table') { expect(page.response_headers['Content-Type']).to eq('text/html; charset=utf-8') }
+
+      it 'has a link to edit a membership' do
+        expect(link).to eq(edit_event_membership_path(event, event_membership))
+      end
+    end
+  end
 end
