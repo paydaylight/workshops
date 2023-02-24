@@ -4,33 +4,37 @@
 # Free Software Foundation, version 3 of the License.
 # See the COPYRIGHT file for details and exceptions.
 
-require "rails_helper"
-include ActiveJob::TestHelper
+require 'rails_helper'
 
 RSpec.describe InvitationMailer, type: :mailer do
+  include ActiveJob::TestHelper
+
   def expect_email_was_sent
     expect(ActionMailer::Base.deliveries.count).to eq(1)
   end
 
-  before :each do
-    ActionMailer::Base.deliveries.clear
+  before do
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.deliveries = []
+    ActionMailer::Base.deliveries.clear
+
+    create(:email_notification, :default_not_yet_invited, body: body)
+  end
+
+  let(:body) do
+    '{{person_dear_name}}, {{invitation_code}}, {{event_name}},'\
+      ' start date - {{event_start}}, end date -  {{event_end}}, {{rsvp_deadline}}'
   end
 
   describe '.invite' do
-    before do
-      membership = create(:membership, attendance: 'Not Yet Invited')
-      @invitation = create(:invitation, membership: membership)
-      @invitation.set_invitation_template
-    end
+    let(:membership) { create(:membership, attendance: 'Not Yet Invited') }
+    let(:invitation) { create(:invitation, membership: membership) }
+    let(:delivery) { InvitationMailer.invite(invitation).deliver_now }
+    let(:email_body) { delivery.body }
 
-    before :each do
-      InvitationMailer.invite(@invitation).deliver_now
-      @delivery = ActionMailer::Base.deliveries.first
-      expect(@delivery).not_to be_nil
-      @body = @delivery.body.empty? ? @delivery.text_part : @delivery.body
+    before do
+      expect(delivery).not_to be_nil
     end
 
     it 'sends email' do
@@ -38,51 +42,50 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it 'To: given member, subject: event_code' do
-      expect(@delivery.to_addrs.first).to eq(@invitation.membership.person.email)
-      expect(@delivery.subject).to include(@invitation.membership.event.code)
+      expect(delivery.to_addrs.first).to eq(invitation.membership.person.email)
+      expect(delivery.subject).to include(invitation.membership.event.code)
     end
 
-    it "message body includes participant's name" do
-      participant_name = @invitation.membership.person.dear_name
+    context "when participant's name" do
+      let(:person_dear_name) { invitation.membership.person.dear_name }
 
-      expect(@body).to have_text(participant_name)
+      it { expect(email_body).to have_text(person_dear_name) }
     end
 
-    it 'message body includes the invitation code' do
-      expect(@body).to have_text(@invitation.code)
+    context 'when invitation code' do
+      it { expect(email_body).to have_text(invitation.code) }
     end
 
-    it 'message body contains event name' do
-      event_name = @invitation.membership.event.name
-      expect(@body).to have_text(event_name)
+    context 'when event name' do
+      let(:event_name) { invitation.membership.event.name }
+
+      it { expect(email_body).to have_text(event_name) }
     end
 
-    it 'message body includes formatted dates' do
-      start_date = @invitation.membership.event.start_date_formatted
-      expect(@body).to have_text(start_date)
+    context 'when formatted dates' do
+      let(:start_date) { invitation.membership.event.start_date_formatted }
+      let(:end_date) { invitation.membership.event.end_date_formatted }
 
-      end_date = @invitation.membership.event.end_date_formatted
-      expect(@body).to have_text(end_date)
+      it { expect(email_body).to have_text(start_date) }
+      it { expect(email_body).to have_text(end_date) }
     end
 
     it 'headers include the senders name and event code' do
-      senders_name_header = "X-BIRS-Sender: #{@invitation.invited_by}"
-      expect(@delivery.header).to have_text(senders_name_header)
+      senders_name_header = "X-BIRS-Sender: #{invitation.invited_by}"
+      expect(delivery.header).to have_text(senders_name_header)
 
-      event_code_header = "X-BIRS-Event: #{@invitation.membership.event.code}"
-      expect(@delivery.header).to have_text(event_code_header)
+      event_code_header = "X-BIRS-Event: #{invitation.membership.event.code}"
+      expect(delivery.header).to have_text(event_code_header)
     end
 
     it 'includes bcc to rsvp address' do
-      rsvp_email = GetSetting.rsvp_email(@invitation.event.location)
-      expect(@delivery.bcc.first).to eq(rsvp_email)
+      rsvp_email = GetSetting.rsvp_email(invitation.event.location)
+      expect(delivery.bcc.first).to eq(rsvp_email)
     end
 
     it 'invitations to physical meetings include a PDF attachment' do
-      event = create(:event, event_format: 'Physical',
-                               event_type: '5 Day Workshop')
-      membership = create(:membership, event: event,
-                                  attendance: 'Not Yet Invited')
+      event = create(:event, event_format: 'Physical', event_type: '5 Day Workshop')
+      membership = create(:membership, event: event, attendance: 'Not Yet Invited')
       invitation = create(:invitation, membership: membership)
       invitation.set_invitation_template
 
@@ -119,7 +122,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = (@today + 4.weeks).strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
 
       it 'sets date to the previous Tuesday, or tomorrow if event in 10 days' do
@@ -135,9 +138,9 @@ RSpec.describe InvitationMailer, type: :mailer do
         # unless Tuesday is in the past. In which case, set reply-by to tomorrow
         if rsvp_date < @today
           tomorrow = (@today + 1.day).strftime('%B %-d, %Y')
-          expect(body).to have_text("before #{tomorrow}")
+          expect(body).to have_text(tomorrow.to_s)
         else
-          expect(body).to have_text("before #{rsvp_date.strftime('%B %-d, %Y')}")
+          expect(body).to have_text(rsvp_date.strftime('%B %-d, %Y').to_s)
         end
       end
 
@@ -151,7 +154,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = (@today + 10.days).strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
 
       it 'sets date to 21 days in advance if event is < 3 months, 5 days away' do
@@ -164,7 +167,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = (@today + 21.days).strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
     end
 
@@ -179,7 +182,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = @event.end_date.strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
     end
 
@@ -196,7 +199,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = @event.end_date.strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
 
       it 'sets dates to the same as Physical workshops, for non-Virtual' do
@@ -211,7 +214,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         body = delivery.body.empty? ? delivery.text_part : delivery.body
 
         rsvp_date = (@today + 4.weeks).strftime('%B %-d, %Y')
-        expect(body).to have_text("before #{rsvp_date}")
+        expect(body).to have_text(rsvp_date.to_s)
       end
     end
   end

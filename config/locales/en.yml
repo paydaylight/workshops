@@ -36,6 +36,7 @@ en:
       add_template: Add template
       delete_confirmation: Are you sure you want to delete template?
     buttons:
+      create: Create
       update: Update
       delete: Delete
     flash:

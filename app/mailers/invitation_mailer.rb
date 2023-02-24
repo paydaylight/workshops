@@ -47,6 +47,7 @@ class InvitationMailer < ApplicationMailer
     {
       'person_dear_name' => @person.dear_name,
       'invitation_date' => @invitation.invited_on.strftime('%A, %B %-d, %Y'),
+      'invitation_code' => @invitation.code,
       'event_name' => @event.name,
       'event_location' => @event.location,
       'event_code' => @event.code,
