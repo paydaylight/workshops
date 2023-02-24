@@ -95,7 +95,7 @@ RSpec.describe 'Email Notifications', type: :feature do
       visit email_notification_path('default', 'Invited')
     end
 
-    describe 'form' do
+    describe 'edit form' do
       it 'shows record' do
         expect(page).to have_text(default_email.body)
       end
@@ -105,6 +105,8 @@ RSpec.describe 'Email Notifications', type: :feature do
           expect(find('#email_notification_new_location')).to be_disabled
           expect(find('#email_notification_new_attendance')).to be_disabled
           expect(find('#email_notification_body')).not_to be_disabled
+          expect(page).not_to have_selector('#email_notification_new_event_type')
+          expect(page).not_to have_selector('#email_notification_new_event_format')
           expect(page).not_to have_button('Delete')
           expect(page).to have_button('Update')
         end
