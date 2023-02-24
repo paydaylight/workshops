@@ -5,7 +5,7 @@
       <div class="form-group row">
         <%= f.label I18n.t('events.location'), class: 'col-sm-6 col-form-label' %>
         <div class="col-sm-6">
-          <%= f.select :new_location, @locations.zip(@locations), { selected: email_notification.event_location || @current_location }, { class: 'custom-select', disabled: email_notification.default } %>
+          <%= f.select :new_location, @locations.zip(@locations), { selected: email_notification.event_location || @current_location, disabled: ['default'] }, { class: 'custom-select', disabled: email_notification.default } %>
         </div>
       </div>
       <div class="form-group row">
