@@ -44,7 +44,7 @@ class UpsertEmailNotification
   end
 
   def maybe_destroy
-    return unless params[:destroy] && !email_notification.new_record?
+    return unless params[:destroy] && !email_notification.new_record? && !email_notification.default
 
     email_notification.destroy!
   end
