@@ -17,6 +17,7 @@ class Event < ApplicationRecord
 
   before_save :clean_data
   before_update :update_name
+  after_create :update_legacy_db
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
@@ -43,18 +44,19 @@ class Event < ApplicationRecord
   end
 
   scope :past, lambda {
-    where("end_date < ? AND template = ?",
-          Date.current, false).order(:start_date).limit(100)
+    where("end_date < ? AND template = ?", Date.current, false).order(:start_date).limit(100)
   }
 
   scope :future, lambda {
-    where("end_date >= ? AND template = ?",
-          Date.current, false).order(:start_date)
+    where("end_date >= ? AND template = ?", Date.current, false).order(:start_date)
   }
 
   scope :year, lambda { |year|
-    where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?",
-           year.to_i, year.to_i, false)
+    where("start_date >= '?-01-01' AND end_date <= '?-12-31' AND template = ?", year.to_i, year.to_i, false)
+  }
+
+  scope :in_range, lambda  { |start_date, end_date|
+    where("start_date >= ? AND end_date <= ? AND template = false", start_date.to_s, end_date.to_s)
   }
 
   scope :location, lambda { |location|
@@ -64,11 +66,9 @@ class Event < ApplicationRecord
   scope :kind, lambda { |kind|
     if kind == 'Research in Teams'
       # RITs stay plural
-      where("event_type = ? AND template = ?", 'Research in Teams', false)
-      .order(:start_date)
+      where("event_type = ? AND template = ?", 'Research in Teams', false).order(:start_date)
     else
-      where("event_type = ? AND template = ?", kind.titleize.singularize, false)
-      .order(:start_date)
+      where("event_type = ? AND template = ?", kind.titleize.singularize, false).order(:start_date)
     end
   }
 
@@ -120,6 +120,12 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def update_legacy_db
+    return unless Rails.env.production?
+
+    LegacyConnector.new.add_event(self)
+  end
 
   def clean_data
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }

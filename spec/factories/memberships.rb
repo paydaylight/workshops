@@ -22,5 +22,15 @@ FactoryBot.define do
     f.staff_notes { Faker::Lorem.sentence(word_count: 1) }
     f.org_notes { Faker::Lorem.sentence(word_count: 1) }
     f.updated_by { 'FactoryBot' }
+
+    trait :stub_for_report do
+      arrival_date { '2023-01-20' }
+      departure_date { '2023-01-25' }
+      has_guest { true }
+      num_guests { 1 }
+      billing { 'BIRS' }
+      special_info { 'I need a mic!' }
+      org_notes { 'Bring bottles of water' }
+    end
   end
 end

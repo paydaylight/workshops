@@ -24,6 +24,7 @@ RUN apt-get update -qq && apt-get dist-upgrade --yes && \
     apt-get upgrade --fix-missing --yes --allow-remove-essential \
     -o Dpkg::Options::="--force-confold"
 
+
 # Update Node
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install --yes nodejs
@@ -77,6 +78,6 @@ ADD entrypoint.sh /sbin/
 RUN chmod 755 /sbin/entrypoint.sh
 RUN mkdir -p /etc/my_init.d
 RUN ln -s /sbin/entrypoint.sh /etc/my_init.d/entrypoint.sh
-RUN echo 'export PATH=$PATH:./bin:/usr/local/rvm/rubies/ruby-2.7.7/bin'>> /root/.bashrc
+RUN echo 'export PATH=$PATH:./bin:/usr/local/rvm/rubies/ruby-2.7.7/bin' >> /root/.bashrc
 RUN echo 'alias rspec="bundle exec rspec"' >> /root/.bashrc
 ENTRYPOINT ["/sbin/entrypoint.sh"]

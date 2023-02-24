@@ -1,0 +1,153 @@
+version: 2.1
+jobs:
+  build_image:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Build the image
+          command: docker build -t birs/workshops:latest .
+          no_output_timeout: 30m
+
+      - run:
+          name: Send to DockerHub
+          command: |
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push birs/workshops:latest
+
+  run_tests:
+    docker:
+      - image: birs/workshops:latest
+        environment:
+          PG_HOST: localhost
+          PG_USER: $DB_USER
+          RAILS_ENV: test
+          RACK_ENV: test
+          CODACY_PROJECT_TOKEN: $CODACY_PROJECT_TOKEN
+      - image: 'circleci/postgres:12.1-alpine-ram'
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    steps:
+      - checkout
+      - run:
+          name: Copy code to app home
+          command: tar cvf - --exclude=".git" . | tar xf - -C /home/app/workshops/
+      - run:
+          name: Wait for database
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgress && exit 1
+      - run:
+          name: Setup database
+          command: |
+            cd /home/app/workshops/db/pg-init
+            sed s/DB_USER/$DB_USER/g db-init.sql | sed s/DB_PASS/$DB_PASS/g > setup.sql
+            PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U postgres < setup.sql
+            rm setup.sql
+      - run:
+          name: Install Bundle
+          command: |
+            cd /home/app/workshops
+            echo "127.0.0.1 db" >> /etc/hosts
+            gem install bundler
+            bundle install
+      - run:
+          name: Default Settings and migrations
+          command: |
+            echo "127.0.0.1 db" >> /etc/hosts
+            chown -R app:app /home/app/workshops
+            cd /home/app/workshops
+            SECRET_KEY_BASE=token DB_USER=$DB_USER DB_PASS=$DB_PASS bin/rails db:migrate RAILS_ENV=test
+            bin/rake ws:init_settings
+      - run:
+          name: Run the tests
+          command: |
+            chown -R app:app /home/app/workshops
+            cd /home/app/workshops
+            bundle exec rspec
+            bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l ruby -p "workshops" -r coverage/lcov/workshops.lcov
+  deploy_to_staging:
+    docker:
+      - image: birs/workshops:latest
+        environment:
+          PG_HOST: localhost
+          PG_USER: $DB_USER
+          RAILS_ENV: development
+          RACK_ENV: development
+      - image: 'circleci/postgres:12.1-alpine-ram'
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "9f:15:4c:07:65:8b:14:ca:f3:68:01:0a:cf:dd:67:95"
+      - run:
+          name: Run Capistrano
+          command: |
+            tar cvf - --exclude=".git" . | tar xf - -C /home/app/workshops/
+            chown -R app:app /home/app/workshops
+            cd /home/app/workshops
+            bundle install
+            bundle exec cap staging deploy
+
+  deploy_to_production:
+    docker:
+      - image: birs/workshops:latest
+        environment:
+          PG_HOST: localhost
+          PG_USER: $DB_USER
+          RAILS_ENV: production
+          RACK_ENV: production
+      - image: 'circleci/postgres:12.1-alpine-ram'
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    steps:
+      - checkout
+      - run:
+          name: Bundle install
+          command: bundle install
+      - add_ssh_keys:
+          fingerprints:
+            - "11:dc:ba:15:ec:d0:88:66:a5:fc:f3:11:bb:3e:7b:46"
+      - run:
+          name: Run Capistrano
+          command: bundle exec cap production deploy:remote
+
+workflows:
+  build_new_image:
+    jobs:
+      - build_image:
+          filters:
+            branches:
+              only: new_image
+
+  run_the_tests:
+    jobs:
+      - run_tests:
+          filters:
+            branches:
+              ignore: /staging|production|new_image/
+
+  deploy_to_staging:
+    jobs:
+      - deploy_to_staging:
+          filters:
+            branches:
+              only: staging
+
+  deploy_to_production:
+    jobs:
+      - deploy_to_production:
+          filters:
+            branches:
+              only: production

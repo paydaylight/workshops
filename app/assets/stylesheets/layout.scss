@@ -14,6 +14,17 @@
       font-size: 1.3em;
     }
   }
+
+  .right {
+    float: right;
+  }
+
+  .app--button {
+    a, a:visited, a:hover, a:active {
+      color: $secondary-link-color;
+      text-decoration: none;
+    }
+  }
 }
 
 // Top Navbar

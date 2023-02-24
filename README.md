@@ -1,11 +1,9 @@
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf9b50e035d4fd487209f3d177ba178)](https://www.codacy.com/gh/brentkearney/workshops/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brentkearney/workshops&amp;utm_campaign=Badge_Grade)
-
-
 # Workshops
 
-"Workshops" is software for managing scientific meetings, or small conferences. It is made with [Ruby on Rails](http://rubyonrails.org)
-and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations
-who host workshops. It is used at the
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fe8b8c203df8443583d1e26080d1849d)](https://app.codacy.com/gh/birs-math/workshops?utm_source=github.com&utm_medium=referral&utm_content=birs-math/workshops&utm_campaign=Badge_Grade_Settings)
+
+"Workshops" is software for managing scientific meetings, or small conferences. It was created by [Brent Kearney](https://github.com/brentkearney/workshops) with [Ruby on Rails](http://rubyonrails.org)
+and released under the GPL-A open-source license. The software is intended to be used by institutions/organizations who host workshops. It is used at the
 [Banff International Research Station](https://workshops.birs.ca/events/future) for managing workshops.
 
 
@@ -155,7 +153,9 @@ This installation method assumes Ruby + Rails are installed on your local machin
 
 2.  Edit the `lib/tasks/ws.rake` file to change default user account information, to set your own credentials for logging into the Workshops web interface.
 
-3.  Adjust `config/database.yml` like the following:
+3.  Rename `config/initializers/custom_env.rb.example` -> `config/initializers/custom_env.rb` for an easy access to ENV vars.
+
+4.  Adjust `config/database.yml` like the following:
   ```
     default: &default
       adapter: sqlite3
@@ -181,26 +181,26 @@ This installation method assumes Ruby + Rails are installed on your local machin
       database: workshops_production
   ```
 
-4.  Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
+5.  Modify the schema to get rid of 'id: :serial', by calling e.g. (in Linux):
     `sed -i -e 's|, id: :serial||' db/schema.rb`
 
-5.  Create the database:
+6.  Create the database:
     `rails db:schema:load`
     (`rails db:migrate` will not work due to unsupported SQL statements)
 
-6.  Setup some default settings and admin account by calling
+7.  Setup some default settings and admin account by calling
     `rails ws:init_settings`
     `rails ws:create_admins` # remember, you changed the credentials earlier
 
-7.  Optionally, populate the database with demo data from `db/seed.rb`
+8.  Optionally, populate the database with demo data from `db/seed.rb`
     rails db:seed
 
-8.  Set environment variables (refer to the end of `docker-compose.yml.example`).
+9.  Set environment variables (refer to the end of `docker-compose.yml.example`).
 
-9.  Start the application
+10. Start the application
     `rails s # short for: rails server`
 
-10. Login to the web interface http://localhost:3000 with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
+11. Login to the web interface http://localhost:3000 with the account you setup in ws.rake, and visit `/settings` (click the drop-down menu in the top-right and choose "Settings"). Update the Site settings with your preferences.
 
 ### License
 Workshops is free software: you can redistribute it and/or modify it under

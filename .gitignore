@@ -46,7 +46,9 @@ lib/assets
 .dockerignore
 .env.db
 .env.web
+.byebug_history
 passenger.*
+
 Dockerfile
 Dockerfile.old
 Dockerfile.bak
@@ -61,8 +63,9 @@ Capfile
 config/deploy.rb
 config/deploy/
 ssh-keys/
-w.log
 
+w.log
+config/initializers/custom_env.rb
 .idea
 app/views/memberships/old-new.html.erb
 app/views/shared/_debugging.erb

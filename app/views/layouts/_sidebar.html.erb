@@ -55,6 +55,14 @@
           class: 'app-menu__item' %>
     </li>
     <% end %>
+    <% if policy(@event).generate_report? %>
+    <li class="nav-second-level">
+      <%= link_to '<i class="fa fa-bullhorn fa-fw"></i>
+      <span class="app-menu__label"> Event Report</span>'.html_safe,
+                  event_report_path(@event), id: 'current_event-reports',
+                  class: 'app-menu__item' %>
+    </li>
+    <% end %>
     <% else # no @event %>
     <li class="nav-item">
       <%= link_to '<i class="fa fa-suitcase fa-fw"></i>
@@ -118,6 +126,12 @@
         <% end %>
       </ul>
     </li>
+    <% if policy(current_user).admin? %>
+    <li class="nav-item">
+      <%= link_to '<i class="fa fa-bullhorn fa-fw"></i><span class="app-menu__label">Global Events Report</span>'.html_safe,
+        events_report_path, id: 'select_events-reports', class: 'app-menu__item' %>
+    </li>
+    <% end %>
     <% end # end if @event else... %>
   </ul>
 </aside>

@@ -30,4 +30,60 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  ui:
+    flash:
+      empty_event_members: Event has no members
+      invalid_date_range: Invalid dates
+    error_messages:
+      no_options_selected: Please select at least one option
+  events:
+    formats:
+      hybrid: Hybrid
+      physical: Physical
+      online: Online
+  event_report:
+    default_field: Default fields
+    optional_field: Optional fields
+    default_fields:
+      event_location: Event location
+      event_name: Event name
+      event_code: Event code
+      event_type: Event type
+      event_format: Event format
+      attendance: Attendance
+      role: Role
+      name: Name
+      email: Email
+      arriving_on: Arriving on
+      departing_on: Departing on
+      has_guests: Has guests?
+      number_of_guests: Number of guests
+      billing: Billing
+      special_info: Special info
+    optional_fields:
+      event_subjects: Event subjects
+      person_id: Person ID
+      organizer_notes: Organizer notes
+      affiliation: Affiliation
+      department: Department
+      academic_status: Academic status
+      year_of_phd: Year of PHD
+      gender: Gender
+      research_areas: Research areas
+      title: Title
+      nserc_grant: NSERC grant
+  memberships:
+    attendance:
+      confirmed: Confirmed
+      invited: Invited
+      undecided: Undecided
+      not_yet_invited: Not Yet Invited
+      declined: Declined
+    roles:
+      contact_organizer: Contact Organizer
+      organizer: Organizer
+      virtual_organizer: Virtual Organizer
+      participant: Participant
+      virtual_participant: Virtual Participant
+      observer: Observer
+      backup_participant: Backup Participant
