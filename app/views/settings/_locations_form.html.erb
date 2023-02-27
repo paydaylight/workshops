@@ -13,7 +13,8 @@
               <label>Location:</label><br>
             </div>
           <div class="col-md-2">
-            <p><%= var_field.text_field 'new_key', size: 5, value: key, class: 'form-control input-sm' %></p>
+          <p><%= var_field.text_field 'new_key', size: 5, value: key,
+                  class: 'form-control input-sm' %></p>
           </div>
         </div>
         <% if values.is_a?(Hash) && !values.blank? %>
@@ -24,8 +25,8 @@
               <%= var_field.time_zone_select 'Timezone', ActiveSupport::TimeZone.us_zones,
                 { default: field_value }, { class: 'form-control' } %>
             <% else %>
-              <% field_value = array_to_s(field_value) if field_value.is_a?(Array) %>
-              <%= var_field.text_field field_name, value: field_value, class: 'form-control' %>
+              <%= var_field.text_field field_name, value: field_value,
+                class: 'form-control' %>
             <% end %>
             </p>
           <% end %><!-- values -->

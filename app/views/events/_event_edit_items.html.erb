@@ -7,9 +7,6 @@
   <% if field_name == 'short_name' %>
     <%= form.label 'Shorter Event Name to appear on name tags (must be under 68 characters)' %>
     <%= form.text_field field_name, maxlength: 67, class: 'form-control' %>
-  <% elsif field_name == 'location' %>
-    <%= form.label "#{field_name.titleize}" %>
-    <%= form.select field_name, location_options, {}, {class: 'form-control'} %>
   <% else %>
     <%= form.label "#{field_name.titleize}" %>
     <% if %w(description press_release).include?(field_name) %>

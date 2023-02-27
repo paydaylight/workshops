@@ -26,8 +26,4 @@ module SettingsHelper
     end
     address
   end
-
-  def array_to_s(values)
-    '[' + values.join(', ') + ']'
-  end
 end

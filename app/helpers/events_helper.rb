@@ -116,8 +116,4 @@ module EventsHelper
   def event_cancelled?(event)
     return ' class="cancelled"'.html_safe if event.cancelled
   end
-
-  def location_options
-    GetSetting.locations || []
-  end
 end

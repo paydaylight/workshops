@@ -132,7 +132,7 @@
     <div class="row">
       <div class="col form-group">
         <%= f.label :location %>:
-        <%= f.select :location, schedule_location_options(@schedule), {selected: @schedule.location}, {class: 'form-control'} %>
+        <%= f.text_field :location, class: 'form-control' %>
       </div>
     </div>
 

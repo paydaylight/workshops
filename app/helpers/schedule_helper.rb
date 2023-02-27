@@ -71,8 +71,4 @@ module ScheduleHelper
       event_schedule_path
     end
   end
-
-  def schedule_location_options(schedule)
-    GetSetting.location_rooms(schedule.event.location)
-  end
 end

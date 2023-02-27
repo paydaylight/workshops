@@ -15,7 +15,7 @@ class ScheduleDashboard < Administrate::BaseDashboard
     end_time: Field::DateTime.with_options(format: "%H:%M"),
     name: Field::String,
     description: Field::Text,
-    location: ScheduleLocationSelect,
+    location: Field::String,
     updated_by: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
