@@ -8,11 +8,11 @@ require 'rails_helper'
 
 describe 'Events Admin Dashboard', type: :feature do
   before do
-    @event = create(:event)
-    person = create(:person)
-    create(:membership, event: @event, person: person, role: 'Organizer')
+  	@event = create(:event)
+  	person = create(:person)
+  	create(:membership, event: @event, person: person, role: 'Organizer')
 
-    @member_user = create(:user,email: person.email,person: person, role: 0)
+  	@member_user = create(:user,email: person.email,person: person, role: 0)
     @staff_user = create(:user, :staff)
     @admin_user = create(:user, :admin)
     @super_admin_user = create(:user, :super_admin)
@@ -23,21 +23,21 @@ describe 'Events Admin Dashboard', type: :feature do
   end
 
   def fill_in_new_events_fields
-    fill_in 'Code', with: '23w0001'
-    fill_in 'Name', with: '5 Day Workshop Schedule Template'
-    fill_in "Short name", with: 'Schedule template'
-    fill_in 'Start date', with: Time.now + 1.days
-    fill_in 'End date', with: Time.now + 3.days
-    fill_in 'Event type', with: 'Summer School'
-    select 'EO', from: 'Location'
-    fill_in 'Description', with: 'Description for testing purposes'
-    fill_in 'Max participants', with: 5
-    fill_in 'Door code', with: 12
-    fill_in 'Updated by', with: 'Capybara'
+  	fill_in 'Code', with: '23w0001'
+	  fill_in 'Name', with: '5 Day Workshop Schedule Template'
+	  fill_in "Short name", with: 'Schedule template'
+	  fill_in 'Start date', with: Time.now + 1.days
+	  fill_in 'End date', with: Time.now + 3.days
+	  fill_in 'Event type', with: 'Summer School'
+	  fill_in 'Location', with: 'EO'
+	  fill_in 'Description', with: 'Description for testing purposes'
+	  fill_in 'Max participants', with: 5
+	  fill_in 'Door code', with: 12
+	  fill_in 'Updated by', with: 'Capybara'
     select 'Mountain Time (US & Canada)', from: 'event[time_zone]'
-    check 'Template'
+	  check 'Template'
 
-    click_on('Create Event')
+	  click_on('Create Event')
   end
 
   context 'As a not-logged in user' do
@@ -83,17 +83,17 @@ describe 'Events Admin Dashboard', type: :feature do
     end
     it "should display admin events dashboard" do
       expect(page).to have_current_path(admin_events_path)
-    end
+	  end
 
-    it "can create new event" do
-      click_link('New event')
+	  it "can create new event" do
+	    click_link('New event')
 
-      fill_in_new_events_fields
+	    fill_in_new_events_fields
 
-      visit admin_events_path
+	    visit admin_events_path
 
-      expect(page).to have_content('23w0001')
-    end
+	    expect(page).to have_content('23w0001')
+	  end
   end
 
   context 'As a super_admin user' do
