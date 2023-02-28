@@ -125,7 +125,7 @@ class GetSetting
   end
 
   def self.locations
-    Setting.Locations.keys
+    Setting.Locations&.keys || []
   end
 
   def self.new_registration_msg
