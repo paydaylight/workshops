@@ -74,7 +74,7 @@ group :development do
   gem 'pronto-flay'
   gem 'pronto-reek'
   gem 'pronto-poper'
-  gem 'rbnacl', '~> 6.0'
+  gem 'rbnacl', '~> 7.0'
   gem 'rubocop-rails'
   gem 'pronto-rubocop'
   gem 'web-console'

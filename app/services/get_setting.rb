@@ -125,7 +125,7 @@ class GetSetting
   end
 
   def self.locations
-    Setting.Locations.keys
+    Setting.Locations&.keys || []
   end
 
   def self.new_registration_msg
@@ -143,7 +143,7 @@ class GetSetting
   end
 
   def self.grant_list
-    Setting.Site['grant_list']
+    Setting.Site['grant_list'] || []
   end
 
   # Emails set in Settings.Site

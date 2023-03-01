@@ -38,7 +38,7 @@ class SortedMembers
   end
 
   def make_members_hash
-    @event.memberships.includes(:person).each do |m|
+    @event.memberships.includes(:person, :event).find_each do |m|
       make_hash(m)
     end
     @memberships

@@ -119,6 +119,14 @@ class EventPolicy
     staff_and_admins
   end
 
+  def generate_report?
+    organizers_and_staff
+  end
+
+  def see_summary?
+    organizers_and_staff
+  end
+
   private
 
   def staff_at_location
@@ -128,12 +136,12 @@ class EventPolicy
 
   def staff_and_admins
     return false unless current_user
-    current_user.is_admin?  || staff_at_location
+    current_user.is_admin? || staff_at_location
   end
 
   def organizers_and_staff
     return false unless current_user
-    current_user.is_organizer?(event) || current_user.is_admin?  || staff_at_location
+    current_user.is_organizer?(event) || current_user.is_admin? || staff_at_location
   end
 
   def member_of_event?

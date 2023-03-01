@@ -59,9 +59,9 @@
             </div>
           </header>
       <% else %>
-          <% if user_signed_in? %>
-          <h1 class="page-header"><%= event_list_title %></h1>
-          <% end %>
+        <% if user_signed_in? %>
+        <h1 class="page-header"><%= event_list_title %></h1>
+        <% end %>
       <% end %>
     <%= yield %>
 

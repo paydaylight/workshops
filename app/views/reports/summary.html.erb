@@ -1,0 +1,18 @@
+<div class="table-responsive">
+  <table class="table table-dark table-bordered text-nowrap table-hover">
+    <thead>
+    <% @report.headers.each do |header| %>
+      <th><%= header %></th>
+    <% end %>
+    </thead>
+    <tbody>
+    <% @report.values.each do |id, fields| %>
+      <tr class="clickable-row" data-href="<%= edit_event_membership_path(@event, id) %>">
+        <% fields.each do |field| %>
+          <td><%= field %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

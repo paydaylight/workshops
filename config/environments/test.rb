@@ -47,4 +47,6 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'localhost:80' }
 
   config.active_record.maintain_test_schema = true
+
+  config.i18n.default_locale = :en
 end

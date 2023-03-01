@@ -37,7 +37,7 @@ Rails.application.routes.draw do
   get 'home' => 'home#index'
   post 'home/toggle_sidebar' => 'home#toggle_sidebar'
 
-  # Events, schedules, memberships
+  # Events, schedules, memberships and reports
   get 'events/my_events' => 'events#my_events', as: :my_events
   get 'events/org_events' => 'events#org_events', as: :org_events
   get 'events/past(/location/:location)' => 'events#past', as: :events_past
@@ -45,6 +45,8 @@ Rails.application.routes.draw do
   get 'events/year/:year(/location/:location)' => 'events#year', as: :events_year
   get 'events/location/:location(/year/:year)' => 'events#location', as: :events_location
   get 'events/kind/:kind(/year/:year)' => 'events#kind', as: :events_kind
+  get '/events/reports' => 'reports#select_events_form', as: :events_report
+  post '/events/reports' => 'reports#export_events', as: :events_generate_report
 
   resources :events do
     get 'schedule/new/:day' => 'schedule#new', as: :schedule_day
@@ -53,6 +55,9 @@ Rails.application.routes.draw do
     post 'schedule/create' => 'schedule#create'
     post 'schedule/publish_schedule' => 'schedule#publish_schedule'
     post 'schedule/:id/recording/:record_action' => 'schedule#recording', as: :recording
+    get 'report' => 'reports#event_form', as: :report
+    get 'summary' => 'reports#summary', as: :summary
+    post 'report' => 'reports#export', as: :generate_report
     resources :schedule
     resources :memberships do
       match 'email_change' => 'memberships#email_change', as: :email_change, via: [:get, :post]

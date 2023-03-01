@@ -30,4 +30,17 @@ FactoryBot.define do
     f.grants { [] }
     f.updated_by { 'FactoryBot' }
   end
+
+  trait :stub_for_report do
+    firstname { 'John' }
+    lastname { 'Doe' }
+    affiliation { 'Test case' }
+    department { 'IT' }
+    academic_status { 'PHD' }
+    phd_year { 0 }
+    gender { 'M' }
+    research_areas { 'cyber security' }
+    title { 'Dr.' }
+    grants { 'some NSERC grant' }
+  end
 end
