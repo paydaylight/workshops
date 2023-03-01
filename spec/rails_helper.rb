@@ -55,6 +55,9 @@ RSpec.configure do |config|
 
   # Render views so we can test the correct response
   config.render_views
+
+  # Allows to travel_to Time inside block
+  config.include ActiveSupport::Testing::TimeHelpers
 end
 
 

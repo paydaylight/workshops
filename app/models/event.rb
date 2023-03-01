@@ -123,6 +123,11 @@ class Event < ApplicationRecord
                 "must be set to one of #{event_formats.join(', ')}")
   end
 
+  def lock_date
+    # Stop accepting some changes after Tuesday on the workshop week
+    (start_date.beginning_of_week + 1.day).end_of_day
+  end
+
   private
 
   def update_legacy_db

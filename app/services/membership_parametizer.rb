@@ -8,7 +8,7 @@
 class MembershipParametizer
   include Pundit
   attr_accessor :form_data, :current_user, :person_data, :user_update,
-                :verify_email
+                :verify_email, :disallowed_role_update
 
   def initialize(membership, form_data, current_user)
     @form_data = form_data
@@ -23,29 +23,49 @@ class MembershipParametizer
     @form_data['num_guests'] = 0 if @form_data['num_guests'].blank?
     db_member = Membership.find(@membership.id)
     db_member.assign_attributes(@form_data)
-    if db_member.changed?
-      @form_data['updated_by'] = @current_user.name
-      update_role?(db_member)
-      @membership.update_remote = true
-    end
+
+    return unless db_member.changed?
+
+    @form_data['updated_by'] = @current_user.name
+    update_role?(db_member)
+    disallow_role_change?(db_member)
+    @membership.update_remote = true
   end
 
   def update_role?(updated_member)
     return unless updated_member.changed_attributes.key?('role')
+
     form_data.delete('role') unless role_edit_allowed?(updated_member)
   end
 
   def role_edit_allowed?(updated_member)
     # To and from Organizer role
-    policy(@membership).edit_role? &&
-      MembershipPolicy.new(current_user, updated_member).edit_role?
+    policy(@membership).edit_role? && MembershipPolicy.new(current_user, updated_member).edit_role?
+  end
+
+  def disallow_role_change?(membership)
+    return unless change_from_virtual_to_physical_after_lock?(membership)
+
+    self.disallowed_role_update = true if form_data.delete('role')
+  end
+
+  def change_from_virtual_to_physical_after_lock?(membership)
+    form_data['role'] == 'Participant' && membership.changed_attributes['role'] == 'Virtual Participant' &&
+      Time.zone.now > event_lock_date
+  end
+
+  def event_lock_date
+    @event_lock_date ||= @membership.event.lock_date
   end
 
   def update_person
     return if @person_data.blank?
+
     person = Person.find(@membership.person_id)
     person.assign_attributes(@person_data)
+
     return unless person.changed?
+
     @person_data = person.attributes
     data_massage
     @membership.update_remote = true
@@ -63,8 +83,7 @@ class MembershipParametizer
     new_email = @person_data.delete('email')
     sync = SyncPerson.new(@membership.person, new_email)
     if sync.has_conflict?
-      create_email_change_confirmation(sync) ||
-        @person_data['email'] = new_email # create validation error
+      create_email_change_confirmation(sync) || @person_data['email'] = new_email # create validation error
     else
       person = sync.change_email
       update_user_email(new_email) # ensure just one account with new email
@@ -76,6 +95,7 @@ class MembershipParametizer
 
   def create_email_change_confirmation(sync)
     return unless @current_user.person_id == @membership.person_id
+
     @verify_email = true # forward to email confirmation form
     sync.create_change_confirmation(sync.find_other_person,
                                     @membership.person,
@@ -116,14 +136,16 @@ class MembershipParametizer
 
   def numeric_phd_year?
     year = person_data['phd_year']
+
     return if year.nil?
+
     person_data['phd_year'] = nil unless year.match?(/\A[0-9]*\Z/)
   end
 
   def update_gender?
-    if @person_data['gender'].blank? || !policy(@membership).edit_personal_info?
-      @person_data['gender'] = Person.find(@membership.person_id).gender
-    end
+    return unless @person_data['gender'].blank? || !policy(@membership).edit_personal_info?
+
+    @person_data['gender'] = Person.find(@membership.person_id).gender
   end
 
   def data
