@@ -63,6 +63,7 @@ Capfile
 config/deploy.rb
 config/deploy/
 ssh-keys/
+config/initializers/custom_env.rb
 
 w.log
 config/initializers/custom_env.rb

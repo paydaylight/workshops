@@ -1,0 +1,48 @@
+---
+locations:
+  BIRS:
+    rooms:
+      - TCPL 201
+      - TCPL 202
+      - Online
+      - Vistas Dining
+      - TCPL Foyer
+      - TCPL Lounge
+      - Front Desk - Professional Development Centre
+      - Banff National Park
+      - Other (See Description)
+  BIRS-JP:
+    rooms:
+      - Kiguli Room
+      - Vermilion Room
+      - Hotel Front Desk
+      - Juniper Bistro
+      - Other (See Description)
+  CMO:
+    rooms:
+      - Hotel Hacienda Los Laureles
+      - Conference Room San Felipe
+      - Online
+      - Restaurant Hotel Hacienda Los Laureles
+      - Oaxaca
+      - Other (See Description)
+  UBCO:
+    rooms:
+      - Main Meeting Room - TBA
+      - Online
+      - Front Desk Skeena
+      - Sunshine - Administration Building
+      - Lounge - TBA
+      - Other (See Description)
+  IMAG:
+    rooms:
+      - Front Desk - Hotel Granada Center
+      - Main Meeting Room - Calle Rector López Argüeta
+      - Restaurant - Hotel Granada Center
+      - Other (See Description)
+  IASM:
+    rooms:
+      - Front Desk - Xianghu Lake National Tourist Resort
+      - Main Meeting Room - TBA
+      - Restaurant - TBA
+      - Other (See Description)
