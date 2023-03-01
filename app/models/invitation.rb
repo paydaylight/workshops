@@ -21,8 +21,6 @@ class Invitation < ApplicationRecord
   end
 
   def send_invite
-    return unless set_invitation_template
-
     update_and_save
     EmailInvitationJob.perform_later(id)
   end
@@ -46,9 +44,6 @@ class Invitation < ApplicationRecord
   end
 
   def send_reminder
-    return unless set_invitation_template
-
-    save # save new template
     update_reminder
     EmailInvitationJob.perform_later(id)
   end
