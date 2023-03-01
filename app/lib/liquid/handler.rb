@@ -8,7 +8,6 @@
 #
 # Partially derived from https://github.com/chamnap/liquid-rails/blob/master/lib/liquid-rails/template_handler.rb and
 # https://boringrails.com/tips/rails-liquid-dynamic-user-content
-require 'liquid'
 
 module Liquid
   # Allows rendering views as liquid with context from controller
