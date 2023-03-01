@@ -83,7 +83,8 @@ end
       'max_participants' => 42,
       'max_virtual' => 300,
       'max_observers' => 5,
-      'billing_codes' => "{'default' => 'EO1', 'USA' => 'EO2'}"
+      'billing_codes' => "{'default' => 'EO1', 'USA' => 'EO2'}",
+      'rooms' => ['Room 1', 'Room 2', 'Room 3'],
     }
   }
 # end

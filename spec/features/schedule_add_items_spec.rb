@@ -28,7 +28,7 @@ describe "Adding a Schedule Item", type: :feature do
   it 'adds an item to the schedule' do
     click_link "Add an item on #{@weekday}"
     page.fill_in 'schedule_name', with: 'New item for test schedule'
-    page.fill_in 'schedule_location', with: 'Somewhere'
+    page.select 'Room 3', from: 'schedule_location'
     click_button 'Add New Schedule Item'
 
     expect(page).to have_content '"New item for test schedule" was successfully
@@ -46,7 +46,7 @@ describe "Adding a Schedule Item", type: :feature do
 
     click_link "Add an item on #{weekday}"
     page.fill_in 'schedule_name', with: 'Testing TZ'
-    page.fill_in 'schedule_location', with: 'Australia'
+    page.select 'Room 3', from: 'schedule_location'
     click_button 'Add New Schedule Item'
 
     new_item = event.schedules.detect { |s| s.name == 'Testing TZ' }
@@ -64,7 +64,7 @@ describe "Adding a Schedule Item", type: :feature do
     new_day = @day + 1.days
     page.select new_day.strftime("%A"), from: 'schedule_day'
     page.fill_in 'schedule_name', with: 'Another item for testing'
-    page.fill_in 'schedule_location', with: 'Somewhere'
+    page.select 'Room 3', from: 'schedule_location'
     click_button 'Add New Schedule Item'
     new_item = @event.schedules.detect {|s| s.name == 'Another item for testing'}
     expect(new_item.start_time.to_date).to eq(new_day)
@@ -73,13 +73,13 @@ describe "Adding a Schedule Item", type: :feature do
   it 'adding an item that overlaps with another item (in a different room) produces a warning notice' do
     click_link "Add an item on #{@weekday}"
     page.fill_in 'schedule_name', with: 'Item One'
-    page.fill_in 'schedule_location', with: 'Location One'
+    page.select 'Room 3', from: 'schedule_location'
     page.select '09', from: 'schedule_start_time_4i'
     page.select '10', from: 'schedule_end_time_4i'
     click_button 'Add New Schedule Item'
 
     page.fill_in 'schedule_name', with: 'Item Two'
-    page.fill_in 'schedule_location', with: 'Location Two'
+    page.select 'Room 2', from: 'schedule_location'
     page.select '09', from: 'schedule_start_time_4i'
     page.select '30', from: 'schedule_start_time_5i'
     page.select '10', from: 'schedule_end_time_4i'
@@ -94,7 +94,7 @@ describe "Adding a Schedule Item", type: :feature do
     expect(current_path).to eq(event_schedule_day_path(@event, @day))
 
     page.fill_in 'schedule_name', with: 'New item for test schedule'
-    page.fill_in 'schedule_location', with: 'Somewhere'
+    page.select 'Room 1', from: 'schedule_location'
     click_button 'Add New Schedule Item'
 
     expect(current_path).to eq(event_schedule_day_path(@event, @day))
@@ -107,7 +107,7 @@ describe "Adding a Schedule Item", type: :feature do
 
     click_link "Add an item on #{@weekday}"
     page.fill_in 'schedule_name', with: 'New item for test schedule'
-    page.fill_in 'schedule_location', with: 'Somewhere'
+    page.select 'Room 3', from: 'schedule_location'
     click_button 'Add New Schedule Item'
 
     expect(page.body).to have_text('was successfully scheduled')
