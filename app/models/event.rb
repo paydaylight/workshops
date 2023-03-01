@@ -72,6 +72,10 @@ class Event < ApplicationRecord
     end
   }
 
+  def attendance_and_role(role:, attendance:)
+    memberships.joins(:person).where(role: role, attendance: attendance)
+  end
+
   def self.templates
     where('template = ?', true)
   end
