@@ -102,13 +102,14 @@ class EmailProcessor
       # messages from maillist_domain include a list of Workshops mailists
       next if recipient[:email].include?("#{maillist_domain}")
 
-      to_email, code, group = extract_recipient(recipient)
+      to_email, code, group, subgroup = extract_recipient(recipient)
 
       problem = validate_parameters(to_email, code, group)
       if problem.empty?
         valid_destinations << {
           event: Event.find(code),
           group: member_group(group),
+          subgroup: subgroup,
           destination: to_email
         }
       else
@@ -131,20 +132,24 @@ class EmailProcessor
   def extract_recipient(recipient)
     to_email = recipient[:email]
     code = recipient[:token].strip # part before the @
-    group = 'Confirmed'
-    code, group = code.split('-') if code.match?(/-/)
-    return [to_email, code, group]
+    code, group, subgroup = code.split('-') if code.match?(/-/)
+
+    if subgroup.nil? && EventMaillist::ATTENDANCE_SUB_GROUPS.include?(group)
+      subgroup = group
+      group = nil
+    end
+
+    return [to_email, code, group || 'Confirmed', subgroup]
   end
 
   def member_group(group)
     group.downcase!
-    return 'orgs' if group == 'orgs' || group == 'organizers'
-    return 'all' if group == 'all'
-    return 'speakers' if group == 'speakers'
 
     Membership::ATTENDANCE.each do |status|
       return status if group.titleize == status
     end
+
+    group
   end
 
   def valid_sender?(event, to_email, group)

@@ -66,7 +66,7 @@ module MembershipsHelper
   end
 
   def invalid_email?(add_members, line)
-    if add_members.errors.messages[:"#{line}"].first.include?("E-mail")
+    if add_members.errors.messages[:"#{line}"].first.include?('E-mail')
       return 'has-error'
     end
   end
@@ -139,7 +139,7 @@ module MembershipsHelper
 
   def show_reply_by_date(member)
     invited_on = last_invited(member, member.event.time_zone)
-    DateTime.parse(rsvp_by(member.event, invited_on)).strftime("%Y-%m-%d")
+    DateTime.parse(rsvp_by(member.event, invited_on)).strftime('%Y-%m-%d')
   end
 
   def show_invited_on_date(member, no_td = false)
@@ -155,7 +155,7 @@ module MembershipsHelper
         data-trigger="hover focus" data-content="By ' +
         format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
         rsvp_by(member.event, invited_on) +
-        '" >'+ member.invited_on.strftime("%Y-%m-%d") +'</a>'
+        '" >'+ member.invited_on.strftime('%Y-%m-%d') +'</a>'
     end
     unless member.invite_reminders.blank?
       column << ' <span id="reminders-icon"><a tabindex="0" title="Reminders Sent" role="button" data-toggle="popover" data-html="true" data-target="#reminders-' + member.id.to_s + '" data-trigger="hover focus" data-content="' + parse_reminders(member) + '"> &nbsp; <i class="fa fa-md fa-repeat"></i></a></span>'.html_safe
@@ -215,13 +215,44 @@ module MembershipsHelper
     to_email = "#{@event.code}-#{status.parameterize(separator: '_')}@#{domain}"
     to_email = "#{@event.code}@#{domain}" if status == 'Confirmed'
 
-    content = mail_to(to_email, to_email, subject: "[#{@event.code}] ", title: "Email #{status} members at #{to_email}")
+    subject = "[#{@event.code}] "
 
-    if status == 'Confirmed'
-      content << ' <span class="separator">|</span> '.html_safe
-      content << mail_to("#{@event.code}-organizers@#{domain}", "#{@event.code}-organizers@#{domain}", title: "Email event organizers", subject: "[#{@event.code}] ").html_safe
+    content = mail_to(to_email, to_email, subject: subject, title: "Email #{status} members at #{to_email}")
+
+    case status
+    when 'Confirmed'
+      organizers_email = "#{@event.code}-organizers@#{domain}"
+      email_in_person_group = "#{@event.code}-in_person@#{domain}"
+      email_online_group = "#{@event.code}-online@#{domain}"
+
+      content << email_separator
+      content << mail_to(organizers_email, organizers_email, title: 'Email event organizers', subject: subject).html_safe
+      content << email_separator
+      content << mail_to(email_in_person_group, email_in_person_group, title: 'Email physical participants', subject: subject).html_safe
+      content << email_separator
+      content << mail_to(email_online_group, email_online_group, title: 'Email online participants', subject: subject).html_safe
+    when 'Invited'
+      email_in_person_group = "#{@event.code}-invited-in_person@#{domain}"
+      email_online_group = "#{@event.code}-invited-online@#{domain}"
+
+      content << email_separator
+      content << mail_to(email_in_person_group, email_in_person_group, title: 'Email invited physical participants', subject: subject).html_safe
+      content << email_separator
+      content << mail_to(email_online_group, email_online_group, title: 'Email invited online participants', subject: subject).html_safe
+    when 'Not Yet Invited'
+      email_in_person_group = "#{@event.code}-not_yet_invited-in_person@#{domain}"
+      email_online_group = "#{@event.code}-not_yet_invited-online@#{domain}"
+
+      content << email_separator
+      content << mail_to(email_in_person_group, email_in_person_group, title: 'Email not yet invited physical participants', subject: subject).html_safe
+      content << email_separator
+      content << mail_to(email_online_group, email_online_group, title: 'Email not yet invited online participants', subject: subject).html_safe
     end
     content.html_safe
+  end
+
+  def email_separator
+    ' <span class="separator">|</span> '.html_safe
   end
 
   def show_email(member)
@@ -235,9 +266,9 @@ module MembershipsHelper
           '</td>'
     elsif policy(member).use_email_addresses?
           column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
-            mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => "E-mail not shared with other members", subject: "[#{@event.code}] ") +
+            mail_to(member.person.email, '<span class="glyphicon glyphicon-lock"></span>'.html_safe, :title => 'E-mail not shared with other members', subject: "[#{@event.code}] ") +
             '</td><td class="hidden-xs hidden-sm rowlink-skip no-print">' +
-            mail_to(member.person.email, '[not shared]', title: "E-mail not shared with other members", subject: "[#{@event.code}] ") +
+            mail_to(member.person.email, '[not shared]', title: 'E-mail not shared with other members', subject: "[#{@event.code}] ") +
             '</td>'
     elsif policy(member).show_not_shared?
       column = '<td class="hidden-md hidden-lg rowlink-skip no-print" align="middle">' +
@@ -302,15 +333,15 @@ module MembershipsHelper
 
   def get_status_heading(status)
     case status
-    when "Confirmed"
+    when 'Confirmed'
       '<i class="fa fa-check-circle-o" aria-hidden="true"></i> Confirmed'
-    when "Invited"
+    when 'Invited'
       '<i class="fa fa-envelope-o" aria-hidden="true"></i> Invited'
-    when "Undecided"
+    when 'Undecided'
       '<i class="fa fa-envelope-open-o" aria-hidden="true"></i> Undecided'
-    when "Not Yet Invited"
+    when 'Not Yet Invited'
       '<i class="fa fa-clock-o" aria-hidden="true"></i> Not Yet Invited'
-    when "Declined"
+    when 'Declined'
       '<i class="fa fa-times-circle-o" aria-hidden="true"></i> Declined'
     else
       status
@@ -323,7 +354,7 @@ module MembershipsHelper
 
   def add_member_icons(member, line)
     case member.role
-    when "Contact Organizer"
+    when 'Contact Organizer'
       line.prepend('<i class="fa fa-star" aria-hidden="true"></i> '
           .html_safe)
     when /Organizer/
