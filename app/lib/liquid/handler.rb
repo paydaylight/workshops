@@ -35,5 +35,9 @@ module Liquid
     def liquid_settings
       { strict_variables: true, strict_filters: true }
     end
+
+    def compilable?
+      false
+    end
   end
 end
