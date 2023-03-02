@@ -46,6 +46,7 @@ class InvitationMailer < ApplicationMailer
   def liquid_context
     {
       'person_dear_name' => @person.dear_name,
+      'person_role' => @invitation.membership.role,
       'invitation_date' => @invitation.invited_on.strftime('%A, %B %-d, %Y'),
       'invitation_code' => @invitation.code,
       'event_name' => @event.name,
