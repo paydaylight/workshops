@@ -29,7 +29,9 @@ module Liquid
                 end
 
       liquid = Liquid::Template.parse(template)
-      liquid.render(context, liquid_settings)
+      liquid.render!(context, liquid_settings)
+    rescue Liquid::Error
+      template.to_s
     end
 
     def liquid_settings

@@ -12,6 +12,6 @@ class EmailInvitationJob < ApplicationJob
 
   def perform(invitation_id)
     invitation = Invitation.find_by_id(invitation_id)
-    InvitationMailer.invite(invitation).deliver_now
+    InvitationMailer.invite(invitation)
   end
 end
