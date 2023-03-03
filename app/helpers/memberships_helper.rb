@@ -113,8 +113,8 @@ module MembershipsHelper
     invited_by.html_safe
   end
 
-  def rsvp_by(event, invited_on)
-    rsvp_by = RsvpDeadline.new(event, invited_on).rsvp_by
+  def rsvp_by(event, invited_on, membership = nil)
+    rsvp_by = RsvpDeadline.new(event, invited_on, membership).rsvp_by
     DateTime.parse(rsvp_by).strftime('%b. %e, %Y')
   end
 
@@ -139,7 +139,7 @@ module MembershipsHelper
 
   def show_reply_by_date(member)
     invited_on = last_invited(member, member.event.time_zone)
-    DateTime.parse(rsvp_by(member.event, invited_on)).strftime('%Y-%m-%d')
+    DateTime.parse(rsvp_by(member.event, invited_on, member)).strftime('%Y-%m-%d')
   end
 
   def show_invited_on_date(member, no_td = false)
