@@ -21,7 +21,7 @@ class ReportsController < ApplicationController
 
   # GET /events/:event_id/summary
   def summary
-    authorize @event, :generate_report?
+    authorize @event, :see_summary?
 
     result = ExportEventMembers.new(event_ids: [@event.id], options: summary_options).call(to: :table)
 

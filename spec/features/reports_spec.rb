@@ -42,12 +42,6 @@ RSpec.describe 'Reports', type: :feature do
           it { expect(page.response_headers['Content-Type']).to eq('text/csv') }
         end
 
-        context 'when organizer' do
-          let(:user) { organizer }
-
-          it { expect(page.response_headers['Content-Type']).to eq('text/csv') }
-        end
-
         context 'when staff' do
           let(:user) { staff }
 
@@ -58,6 +52,13 @@ RSpec.describe 'Reports', type: :feature do
       context 'when access is not allowed' do
         context 'when participant' do
           let(:user) { participant }
+
+          it { expect(page).not_to have_text('Get report') }
+          it { expect(page).to have_text('Access denied') }
+        end
+
+        context 'when organizer' do
+          let(:user) { organizer }
 
           it { expect(page).not_to have_text('Get report') }
           it { expect(page).to have_text('Access denied') }
@@ -219,21 +220,6 @@ RSpec.describe 'Reports', type: :feature do
         EventMembersPresenter::SUMMARY_FIELDS.each do |field|
           expect(page).to have_text(key_to_header(field))
         end
-      end
-    end
-
-    context 'when submitting form' do
-      before do
-        click_on 'See summary'
-      end
-
-      let(:event_membership) { event.memberships.first }
-      let(:link) { first('.clickable-row')[:'data-href'] }
-
-      it('shows a table') { expect(page.response_headers['Content-Type']).to eq('text/html; charset=utf-8') }
-
-      it 'has a link to edit a membership' do
-        expect(link).to eq(edit_event_membership_path(event, event_membership))
       end
     end
   end

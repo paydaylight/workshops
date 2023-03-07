@@ -120,12 +120,10 @@ class EventPolicy
   end
 
   def generate_report?
-    organizers_and_staff
+    staff_and_admins
   end
 
-  def see_summary?
-    organizers_and_staff
-  end
+  alias see_summary? generate_report?
 
   private
 
