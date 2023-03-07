@@ -154,7 +154,7 @@ module MembershipsHelper
         data-target="#invitations-' + member.id.to_s + '"
         data-trigger="hover focus" data-content="By ' +
         format_invited_by(member) + '<br><b>Reply-by date:</b> ' +
-        rsvp_by(member.event, invited_on) +
+        rsvp_by(member.event, invited_on, member) +
         '" >'+ member.invited_on.strftime('%Y-%m-%d') +'</a>'
     end
     unless member.invite_reminders.blank?
