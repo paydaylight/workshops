@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_22_194013) do
+ActiveRecord::Schema.define(version: 2023_03_07_095205) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -170,6 +170,40 @@ ActiveRecord::Schema.define(version: 2021_07_22_194013) do
     t.datetime "updated_at", null: false
     t.string "grants"
     t.index ["email"], name: "index_people_on_email", unique: true
+  end
+
+  create_table "que_jobs", comment: "7", force: :cascade do |t|
+    t.integer "priority", limit: 2, default: 100, null: false
+    t.datetime "run_at", default: -> { "now()" }, null: false
+    t.text "job_class", null: false
+    t.integer "error_count", default: 0, null: false
+    t.text "last_error_message"
+    t.text "queue", default: "default", null: false
+    t.text "last_error_backtrace"
+    t.datetime "finished_at"
+    t.datetime "expired_at"
+    t.jsonb "args", default: [], null: false
+    t.jsonb "data", default: {}, null: false
+    t.integer "job_schema_version", null: false
+    t.jsonb "kwargs", default: {}, null: false
+    t.index ["args"], name: "que_jobs_args_gin_idx", opclass: :jsonb_path_ops, using: :gin
+    t.index ["data"], name: "que_jobs_data_gin_idx", opclass: :jsonb_path_ops, using: :gin
+    t.index ["job_schema_version", "queue", "priority", "run_at", "id"], name: "que_poll_idx", where: "((finished_at IS NULL) AND (expired_at IS NULL))"
+    t.index ["kwargs"], name: "que_jobs_kwargs_gin_idx", opclass: :jsonb_path_ops, using: :gin
+  end
+
+  create_table "que_lockers", primary_key: "pid", id: :integer, default: nil, force: :cascade do |t|
+    t.integer "worker_count", null: false
+    t.integer "worker_priorities", null: false, array: true
+    t.integer "ruby_pid", null: false
+    t.text "ruby_hostname", null: false
+    t.text "queues", null: false, array: true
+    t.boolean "listening", null: false
+    t.integer "job_schema_version", default: 1
+  end
+
+  create_table "que_values", primary_key: "key", id: :text, force: :cascade do |t|
+    t.jsonb "value", default: {}, null: false
   end
 
   create_table "schedules", id: :serial, force: :cascade do |t|

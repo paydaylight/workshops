@@ -38,6 +38,9 @@ en:
     error_messages:
       no_options_selected: Please select at least one option
       role_change_to_physical_after_lock: "Cannot change role to Participant after event lock date %{lock_date}. Please contact BIRS staff"
+  email:
+    event_statistics:
+      subject: 'Participation status for %{event_code}'
   events:
     formats:
       hybrid: Hybrid

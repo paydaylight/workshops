@@ -28,6 +28,7 @@ gem 'pg', '1.1.3'
 gem 'popper_js', '~> 1.16.0'
 gem 'pundit'
 gem 'psych', '~> 3.3.2'
+gem 'que', '~> 2.2.0'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rails', '~> 5.2.4.5'
 gem 'rack', ">= 2.2.3"

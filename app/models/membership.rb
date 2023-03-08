@@ -45,6 +45,12 @@ class Membership < ApplicationRecord
   ONLINE_ROLES = ['Virtual Organizer', 'Virtual Participant'].freeze
   IN_PERSON_ROLES = ['Contact Organizer', 'Organizer', 'Participant'].freeze
 
+  scope :confirmed, -> { where(attendance: 'Confirmed') }
+  scope :invited, -> { where(attendance: 'Invited') }
+  scope :undecided, -> { where(attendance: 'Undecided') }
+  scope :not_yet_invited, -> { where(attendance: 'Not Yet Invited') }
+  scope :declined, -> { where(attendance: 'Declined') }
+
   include SharedDecorators
 
   def shares_email?
