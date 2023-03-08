@@ -343,4 +343,41 @@ namespace :ws do
     end
   end
 
+
+  ##
+  ## Update legacy person_id records from a CSV
+  ##
+  ## CSV fileds should include
+  ##   - person_id: The primary key of the Workshops Person record
+  ##   - legacy_id: The legacy ID to associate with the Person record
+  ##
+  ## We check that the existing value is null and fill it in if so. 
+  ## Other cases are not handled (e.g. existing or clashing legacy_id
+  ##
+  require 'csv'
+  desc "Update legacy person_id records"
+  task :update_legacy_person, [:csvfile] => :environment do |_t, args|
+    csvfile = args[:csvfile]
+    csv = CSV.foreach(csvfile, :headers=>true, col_sep: ",") do |row|
+      begin
+        p = Person.find(row['person_id'])
+	target_legacy_id = row['legacy_id'].to_i
+
+        if p.legacy_id.nil?
+          puts "Person #{row['person_id']} has null legacy_id, updating with #{row['legacy_id']}"
+          p.legacy_id = target_legacy_id
+          p.save
+        elsif p.legacy_id == target_legacy_id
+          puts "Person #{row['person_id']} found, but already correctly set"
+        else
+          puts "Person #{row['person_id']} found, but existing legacy_id disagrees #{p.legacy_id} != #{row['legacy_id']})"
+        end
+
+      rescue ActiveRecord::RecordNotFound => e
+        puts "No record for #{row['person_id']}"
+      end
+    end
+  end
+
+
 end
