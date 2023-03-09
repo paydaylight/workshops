@@ -71,7 +71,7 @@ class EventMaillist
     cc = remove_trailing_comma(cc)
     recipients = { to: to, cc: cc }
 
-    if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+    if ENV['APPLICATION_HOST'].include?('staging')
       recipients = { to: GetSetting.site_email('webmaster_email'), cc: '' }
     end
 
@@ -127,7 +127,7 @@ class EventMaillist
       recipient = %Q("#{member.person.name}" <#{member.person.email}>)
     end
 
-    if ENV['APPLICATION_HOST'].include?('staging') && @event.code !~ /666/
+    if ENV['APPLICATION_HOST'].include?('staging')
       recipient = GetSetting.site_email('webmaster_email')
     end
 

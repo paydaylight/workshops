@@ -20,7 +20,8 @@ class InvitationEmailRecipients
 
   def to_email
     return webmaster_email if development_environment?
-    '"' + @invitation.person.name + '" <' + @invitation.person.email + '>'
+
+    "\"#{@invitation.person.name}\" <#{@invitation.person.email}>"
   end
 
   def from_email
