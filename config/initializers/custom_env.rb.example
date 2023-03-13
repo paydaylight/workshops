@@ -19,3 +19,4 @@ ENV['EMAIL_STARTTLS'] = true
 ENV['MAILGUN_API_KEY'] = 'xxxxxxxxxxx'
 ENV['MAILGUN_EMAIL_DOMAIN'] = 'staging.example.com'
 ENV['CORS_HOSTS'] = "'https://locomotive.works', 'http://locomotive.works', 'https://www.example.com', 'http://www.example.com'"
+ENV['MAILHOG_HOST'] = 'localhost'

@@ -67,6 +67,7 @@ services:
       - MAILGUN_EMAIL_DOMAIN=staging.example.com
       - CORS_HOSTS="'https://locomotive.works', 'http://locomotive.works',
         'https://www.example.com', 'http://www.example.com'"
+      - MAILHOG_HOST=xxxxxxxxxxx
 
 # adding labels allows pruning of unused system volumes with:
 # docker volume prune --filter 'label!=workshops_volume'"
