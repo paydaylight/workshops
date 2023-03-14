@@ -303,7 +303,7 @@ module MembershipsHelper
       #{pluralize_no_count(physical_spots, 'in-person spot')}, and
       <strong>#{virtual_spots}/#{max_virtual}</strong>
       #{pluralize_no_count(virtual_spots, 'virtual spot')} left
-      (includes confirmed + invited)."
+      (includes confirmed + undecided + invited)."
 
     msg << cancellations_msg(physical_spots, virtual_spots)
   end
