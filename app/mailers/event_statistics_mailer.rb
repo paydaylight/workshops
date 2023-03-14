@@ -7,9 +7,8 @@ class EventStatisticsMailer < ApplicationMailer
     @confirmed_count = Membership.confirmed.where(event: @event).count
     @invited_count = Membership.invited.where(event: @event).count
     @undecided_count = Membership.undecided.where(event: @event).count
-    @not_yet_invited_count = Membership.not_yet_invited.where(event: @event).count
-    @declined_count = Membership.declined.where(event: @event).count
-
+    @physical_spots = @event.max_participants - @event.num_invited_participants
+    @virtual_spots = @event.max_virtual - @event.num_invited_virtual
     recipients = []
 
     @event.organizers.each do |organizer|
@@ -20,7 +19,7 @@ class EventStatisticsMailer < ApplicationMailer
       recipients << to_email_address(admin)
     end
 
-    subject = I18n.t('email.event_statistics.subject', event_code: @event.code)
+    subject = I18n.t('email.event_statistics.subject', location: @event.location, event_code: @event.code)
 
     mail(to: recipients.join(', '), subject: subject)
   end

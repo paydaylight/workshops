@@ -1,9 +1,9 @@
-<%= @event.code %> status on <%= Date.today %>:
+In reviewing our registration database for <%= @event.location %> Workshop <%= @event.code %>, you currently have <%= @confirmed_count %> confirmed participants, <%= @undecided_count %> maybe's and <%= @invited_count %> invited participants who have not replied.
+This leaves you <%= @physical_spots %> physical, and <%= @virtual_spots %> virtual available spots. We encourage you to issue new invites to suitable candidates at your earliest convenience.
+Thank you and let us know if any questions.
 
-Confirmed: <%= @confirmed_count %>
-Invited: <%= @invited_count %>
-Undecided: <%= @undecided_count %>
-Not Yet Invited: <%= @not_yet_invited_count %>
-Declined: <%= @declined_count %>
+Best regards,
 
-Please do not reply, this is an automated email.
+Chee Chow
+BIRS Programme Coordinator
+birs@birs.ca
