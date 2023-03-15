@@ -25,7 +25,7 @@ class EventDashboard < Administrate::BaseDashboard
     end_date: Field::DateTime.with_options(format: "%Y-%m-%d"),
     event_type: Field::String.with_options(searchable: true),
     event_format: Field::Select.with_options(collection: event_formats),
-    location: Field::Select.with_options(collection: GetSetting.locations),
+    location: Field::String,
     description: Field::Text.with_options(searchable: true),
     press_release: Field::Text.with_options(searchable: true),
     max_participants: Field::Number,
