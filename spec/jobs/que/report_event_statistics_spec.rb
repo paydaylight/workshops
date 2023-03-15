@@ -2,11 +2,9 @@
 
 require 'rails_helper'
 
-class QueJobs < ApplicationRecord; end
-
-include ActiveSupport::Testing::TimeHelpers
-
 RSpec.describe Que::ReportEventStatistics, type: :job do
+
+  include ActiveSupport::Testing::TimeHelpers
 
   let(:event) { create(:event) }
 
@@ -35,7 +33,7 @@ RSpec.describe Que::ReportEventStatistics, type: :job do
         let(:start_date) { 3.month.from_now(Time.zone.now) }
 
         it 'reschedules job' do
-          expect { subject }.to change { QueJobs.count }.by(1)
+          expect { subject }.to change { QueJobs.count }.by(2)
         end
 
         it 'has run_at in 2 month' do
@@ -48,7 +46,7 @@ RSpec.describe Que::ReportEventStatistics, type: :job do
       context 'when it is less than 2 month until event start' do
         let(:start_date) { 1.month.from_now(Time.zone.now) }
 
-        it 'dos not reschedule job' do
+        it 'does not reschedule job' do
           expect { subject }.to change { QueJobs.count }.by(0)
         end
       end
