@@ -22,6 +22,8 @@
 class LegacyConnector
   require 'rest_client'
 
+  SUCCESS_CODE = 200
+
   def initialize
     @rest_url = GetSetting.site_setting('legacy_api')
     @rest_url = nil if not_production_or_test
@@ -41,11 +43,11 @@ class LegacyConnector
   # add a new event to legacy db
   def add_event(event)
     response = JSON.parse(post_to("event_add/#{event.code}", event))
-    if response.empty?
+    if response&.code == SUCCESS_CODE
       add_members(event_code: event.code, members: event.memberships,
                   updated_by: 'Workshops')
     else
-      send_error_report(nil, JSON.parse(response))
+      send_error_report(nil, response.to_s)
     end
   end
 
