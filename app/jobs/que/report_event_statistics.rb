@@ -11,7 +11,7 @@ module Que
     end
 
     def schedule_job(event)
-      next_run = 5.minutes.from_now(DateTime.now.in_time_zone(event.time_zone))
+      next_run = 1.hour.from_now(DateTime.now.in_time_zone(event.time_zone))
 
       return if event.start_date_in_time_zone < next_run
 
