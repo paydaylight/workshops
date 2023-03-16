@@ -12,6 +12,8 @@
 module Liquid
   # Allows rendering views as liquid with context from controller
   class Handler
+    include ActionView::Helpers::TextHelper
+
     def self.call(template)
       "Liquid::Handler.new(self).render(#{template.source.inspect}, local_assigns)"
     end
@@ -20,7 +22,6 @@ module Liquid
       @view = view
       @controller = @view.controller
     end
-
     def render(template, _options)
       context = if @controller.respond_to?(:liquid_context, true)
                   @controller.send(:liquid_context)
@@ -29,7 +30,7 @@ module Liquid
                 end
 
       liquid = Liquid::Template.parse(template)
-      liquid.render!(context, liquid_settings)
+      simple_format(liquid.render!(context, liquid_settings))
     rescue Liquid::Error
       template.to_s
     end
