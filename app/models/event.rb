@@ -73,6 +73,10 @@ class Event < ApplicationRecord
     end
   }
 
+  def staff_at_location
+    User.staff.where(location: location)
+  end
+
   def attendance_and_role(role:, attendance:)
     memberships.joins(:person).where(role: role, attendance: attendance)
   end

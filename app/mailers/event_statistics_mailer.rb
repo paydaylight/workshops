@@ -15,8 +15,8 @@ class EventStatisticsMailer < ApplicationMailer
       recipients << to_email_address(organizer)
     end
 
-    User.admins.each do |admin|
-      recipients << to_email_address(admin)
+    @event.staff_at_location.each do |staff|
+      recipients << to_email_address(staff)
     end
 
     subject = I18n.t('email.event_statistics.subject', location: @event.location, event_code: @event.code)
