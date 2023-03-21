@@ -120,4 +120,28 @@ module EventsHelper
   def location_options
     GetSetting.locations || []
   end
+
+  def events_hash
+    @events_hash ||= {}
+  end
+
+  def onsite_confirmed_count(event)
+    return events_hash["#{event.id}_onsite_confirmed"] if events_hash["#{event.id}_onsite_confirmed"]
+
+    events_hash["#{event.id}_onsite_confirmed"] = Membership.where(
+      attendance: 'Confirmed', role: Membership::IN_PERSON_ROLES, event: event
+    ).count
+  end
+
+  def virtual_confirmed_count(event)
+    return events_hash["#{event.id}_virtual_confirmed"] if events_hash["#{event.id}_virtual_confirmed"]
+
+    events_hash["#{event.id}_virtual_confirmed"] = Membership.where(
+      attendance: 'Confirmed', role: Membership::ONLINE_ROLES, event: event
+    ).count
+  end
+
+  def observers_count(event)
+    event.confirmed_count - virtual_confirmed_count(event) - onsite_confirmed_count(event)
+  end
 end
