@@ -84,7 +84,7 @@ RSpec.describe MembershipsController, type: :controller do
 
       it 'POST responds with redirect to sign_in page' do
         post :invite, params: { event_id: @event.id, invite_members_form:
-          { "#{@membership.id}": "1" } }
+          { "#{@membership.id}": '1' } }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -167,7 +167,7 @@ RSpec.describe MembershipsController, type: :controller do
         end
 
         it 'POST responds with redirect and error message' do
-          post :invite, params: { event_id: 1, invite_members_form:{ "12": "1" }}
+          post :invite, params: { event_id: 1, invite_members_form:{ "12": '1' }}
 
           expect(response).to redirect_to(events_future_path)
           expect(flash[:error]).to be_present
@@ -621,6 +621,44 @@ RSpec.describe MembershipsController, type: :controller do
             expect(updated_member.role).to eq('Participant')
           end
 
+          describe "event lock date" do
+            before do
+              travel_to today
+
+              @membership.update(role: 'Virtual Participant')
+              @event.update_attribute(:start_date, Date.today.beginning_of_week + 3.days)
+
+              @params['membership']['role'] = 'Participant'
+              patch :update, params: @params
+            end
+
+            after do
+              travel_back
+            end
+
+            context "when it's past Tuesday on workshop week" do
+              let(:today) { Date.today.beginning_of_week + 2.days }
+
+              it 'disallows changing Virtual Participant role to Participant' do
+                expect(@membership.reload.role).to eq('Virtual Participant')
+              end
+
+              it 'redirects to event_membership_path' do
+                expect(response).to redirect_to(event_membership_path(@event, @membership))
+                lock_date = (Date.today.beginning_of_week + 1.day).strftime('%Y-%m-%d')
+                expect(flash[:error]).to eq(I18n.t('ui.error_messages.role_change_to_physical_after_lock', lock_date: lock_date))
+              end
+            end
+
+            context 'when it is before Tuesday on workshop week' do
+              let(:today) { Date.today.beginning_of_week }
+
+              it 'changes role' do
+                expect(@membership.reload.role).to eq('Participant')
+              end
+            end
+          end
+
           it 'disallows changing role to an Organizer role' do
             @membership.role = 'Participant'
             @membership.save
@@ -896,7 +934,7 @@ RSpec.describe MembershipsController, type: :controller do
 
         def denies_post_access
           post :invite, params: { event_id: @event.id, invite_members_form:
-                    { "#{@membership.id}": "1" } }
+                    { "#{@membership.id}": '1' } }
           denies_access
         end
 
@@ -908,7 +946,7 @@ RSpec.describe MembershipsController, type: :controller do
         def allows_post_access
           member = create(:membership, attendance: 'Not Yet Invited')
           post :invite, params: { event_id: @event.id, invite_members_form:
-                    { "#{member.id}": "1" } }
+                    { "#{member.id}": '1' } }
 
           expect(flash[:success]).to be_present
           expect(Membership.find(member.id).attendance).to eq('Invited')
@@ -997,7 +1035,7 @@ RSpec.describe MembershipsController, type: :controller do
 
             member = create(:membership, attendance: 'Not Yet Invited')
             post :invite, params: { event_id: @event.id, invite_members_form:
-                      { "#{member.id}": "1" } }
+                      { "#{member.id}": '1' } }
 
             expect(flash[:error]).to be_present
             updated_member = Membership.find(member.id)
@@ -1010,7 +1048,7 @@ RSpec.describe MembershipsController, type: :controller do
             @event.save
 
             member = create(:membership, attendance: 'Not Yet Invited', role: 'Observer')
-            post :invite, params: { event_id: @event.id, invite_members_form: { "#{member.id}": "1" } }
+            post :invite, params: { event_id: @event.id, invite_members_form: { "#{member.id}": '1' } }
 
             expect(flash[:success]).to be_present
             updated_member = Membership.find(member.id)
@@ -1024,7 +1062,7 @@ RSpec.describe MembershipsController, type: :controller do
             member = create(:membership, attendance: 'Not Yet Invited',
                                                role: 'Observer')
             post :invite, params: { event_id: @event.id, invite_members_form:
-                      { "#{member.id}": "1" } }
+                      { "#{member.id}": '1' } }
 
             expect(flash[:error]).to be_present
             updated_member = Membership.find(member.id)

@@ -93,12 +93,16 @@ class MembershipsController < ApplicationController
         format.html do
           if member_params.verify_email
             redirect_to event_membership_email_change_path(@event, @membership),
-              warning: 'Membership updated, but there is an email conflict!'
+                        warning: 'Membership updated, but there is an email conflict!'
           elsif member_params.new_user_email?
             sign_out @current_user
             redirect_to sign_in_path, notice: 'Please verify your account by
               clicking the confirmation link that we sent to your new email
               address.'.squish
+          elsif member_params.disallowed_role_update
+            flash[:error] = I18n.t('ui.error_messages.role_change_to_physical_after_lock',
+                                   lock_date: member_params.event_lock_date.strftime('%Y-%m-%d'))
+            redirect_to event_membership_path(@event, @membership)
           else
             if @membership.warn_guest
               flash[:warning] = '<strong>Note:</strong> number of guests was
@@ -134,7 +138,7 @@ class MembershipsController < ApplicationController
                                              @membership.person_id).first
     if @confirmation.nil?
       redirect_to event_membership_path(@membership.event, @membership),
-        error: 'No email change confirmation record found.' and return
+                  error: 'No email change confirmation record found.' and return
     end
     person = Person.find_by_id(@confirmation.replace_person_id) ||
              @membership.person
@@ -142,7 +146,7 @@ class MembershipsController < ApplicationController
 
     if request.post? && @email_form.verify_email_change(confirm_email_params)
       redirect_to event_membership_path(@membership.event, @membership),
-        success: 'Email changed and records consolidated!'
+                  success: 'Email changed and records consolidated!'
     end
   end
 
@@ -150,7 +154,7 @@ class MembershipsController < ApplicationController
     ConfirmEmailChange.where(replace_with_id: @membership.person_id)
                       .destroy_all
     redirect_to event_membership_path(@membership.event, @membership),
-        success: 'Email change cancelled.'
+                success: 'Email change cancelled.'
   end
 
   # DELETE /events/:event_id/memberships/1
@@ -186,10 +190,10 @@ class MembershipsController < ApplicationController
     if @invite_members.error_msg.empty?
       @invite_members.send_invitations
       redirect_to event_memberships_path(@event),
-        success: @invite_members.success_msg
+                  success: @invite_members.success_msg
     else
       redirect_to invite_event_memberships_path(@event),
-        error: @invite_members.error_msg
+                  error: @invite_members.error_msg
     end
   end
 
@@ -245,7 +249,7 @@ class MembershipsController < ApplicationController
 
   def add_params
     params.require(:add_members_form).permit(:add_members, :role,
-                   new_people: [:email, :lastname, :firstname, :affiliation])
+                                             new_people: [:email, :lastname, :firstname, :affiliation])
   end
 
   def invite_params
