@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Que
-  class ReportEventStatistics < Job
+  class ReportEventStatisticsJob < Job
     def run(event_id:)
       event = Event.find(event_id)
 

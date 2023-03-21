@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Que::ReportEventStatistics, type: :job do
+RSpec.describe Que::ReportEventStatisticsJob, type: :job do
 
   include ActiveSupport::Testing::TimeHelpers
 

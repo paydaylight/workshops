@@ -142,7 +142,7 @@ class Event < ApplicationRecord
   end
 
   def enqueue_statistics_job
-    Que::ReportEventStatistics.new({}).schedule_job(self)
+    Que::ReportEventStatisticsJob.new({}).schedule_job(self)
   end
 
   def clean_data
