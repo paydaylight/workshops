@@ -22,7 +22,8 @@ class Invitation < ApplicationRecord
 
   def send_invite
     update_and_save
-    EmailInvitationJob.perform_later(id)
+
+    EmailInvitationJob.perform_later(id, initial_email: membership.attendance == 'Not Yet Invited')
   end
 
   def set_invitation_template
@@ -127,7 +128,6 @@ class Invitation < ApplicationRecord
     membership.is_rsvp = true # don't resend organizer notice
     membership.person.member_import = true
     if membership.attendance == 'Not Yet Invited'
-      membership.attendance = 'Invited'
       membership.arrival_date = nil
       membership.departure_date = nil
       membership.role = 'Participant' if membership.role == 'Backup Participant'
