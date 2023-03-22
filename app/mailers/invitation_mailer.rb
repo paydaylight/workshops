@@ -56,6 +56,7 @@ class InvitationMailer < ApplicationMailer
       'rsvp_deadline' => RsvpDeadline.new(@event, DateTime.current, @invitation.membership).rsvp_by,
       'event_start' => @event.start_date_formatted,
       'event_end' => @event.end_date_formatted,
+      'event_url' => @event.url,
       'organizers' => PersonWithAffilList.compose(@event.organizers)
     }
   end

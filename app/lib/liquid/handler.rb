@@ -30,13 +30,9 @@ module Liquid
                 end
 
       liquid = Liquid::Template.parse(template)
-      simple_format(liquid.render!(context, liquid_settings))
+      simple_format(liquid.render!(context))
     rescue Liquid::Error
-      template.to_s
-    end
-
-    def liquid_settings
-      { strict_variables: true, strict_filters: true }
+      simple_format(template.to_s)
     end
 
     def compilable?
