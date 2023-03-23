@@ -42,12 +42,12 @@ class LegacyConnector
 
   # add a new event to legacy db
   def add_event(event)
-    response = JSON.parse(post_to("event_add/#{event.code}", event))
-    if response&.code == SUCCESS_CODE
+    response = post_to("event_add/#{event.code}", event)
+    if response.try(:code) == SUCCESS_CODE
       add_members(event_code: event.code, members: event.memberships,
                   updated_by: 'Workshops')
     else
-      send_error_report(nil, response.to_s)
+      send_error_report(nil, response&.to_s)
     end
   end
 
