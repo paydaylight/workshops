@@ -1,4 +1,4 @@
-# ./app/services/rsvp_deadline.rb
+# ./app/lib/rsvp_deadline.rb
 #
 # Copyright (c) 2018 Banff International Research Station
 #
