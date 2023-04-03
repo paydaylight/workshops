@@ -20,11 +20,14 @@
 
 class InvitationMailer < ApplicationMailer
   prepend_view_path Liquid::Resolver.instance
+  include InvitationMailerContext
 
   def invite(invitation)
     @invitation = invitation
-    @person = invitation.membership.person
-    @event = invitation.membership.event
+    @membership = invitation.membership
+    @person = @membership.person
+    @event = @membership.event
+
 
     subject = "#{@event.location} Workshop Invitation: #{@event.name} (#{@event.code})"
     recipients = InvitationEmailRecipients.new(invitation).compose
@@ -41,24 +44,5 @@ class InvitationMailer < ApplicationMailer
       subject: subject,
       template_path: @invitation.email_template_path
     )
-  end
-
-  def liquid_context
-    {
-      'person_dear_name' => @person.dear_name,
-      'person_role' => @invitation.membership.role,
-      'invitation_date' => @invitation.invited_on.strftime('%A, %B %-d, %Y'),
-      'invitation_code' => @invitation.code,
-      'event_name' => @event.name,
-      'event_location' => @event.location,
-      'event_code' => @event.code,
-      'rsvp_url' => @invitation.rsvp_url,
-      'rsvp_deadline' => RsvpDeadline.new(@event, DateTime.current, @invitation.membership).rsvp_by,
-      'event_start' => @event.start_date_formatted,
-      'event_end' => @event.end_date_formatted,
-      'event_url' => @event.url,
-      'organizers' => PersonWithAffilList.compose(@event.organizers),
-      'is_observer' => @invitation.membership.role.include?('Observer')
-    }
   end
 end
