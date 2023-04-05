@@ -22,7 +22,7 @@ class EventStatisticsMailer < ApplicationMailer
     end
 
     @event.staff_at_location.each do |staff|
-      recipients << to_email_address(staff)
+      recipients << staff.to_email_address
     end
 
     cc = GetSetting.email(@event.location, 'event_statistics_cc')

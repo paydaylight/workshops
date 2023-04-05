@@ -81,6 +81,10 @@ class Membership < ApplicationRecord
     role.match?('Virtual')
   end
 
+  def in_person?
+    IN_PERSON_ROLES.includes?(role)
+  end
+
   private
 
   def set_billing
