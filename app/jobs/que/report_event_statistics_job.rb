@@ -6,7 +6,7 @@ module Que
       event = Event.find(event_id)
 
       EventStatisticsMailer.notify(event_id: event_id).deliver_now
-    ensure
+
       schedule_job(event)
     end
 

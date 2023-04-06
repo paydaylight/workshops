@@ -6,20 +6,20 @@ RSpec.describe Que::ReportEventStatisticsJob, type: :job do
 
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:event) { create(:event) }
+  let(:event) { create(:event_with_members) }
 
   describe '.enqueue' do
-    subject { described_class.enqueue(event_id: event.id) }
+    subject { described_class.run(event_id: event.id) }
 
     it 'calls EventStatisticsMailer' do
-      allow(EventStatisticsMailer).to receive(:notify)
+      allow(EventStatisticsMailer).to receive(:notify).and_call_original
       subject
       expect(EventStatisticsMailer).to have_received(:notify).with(event_id: event.id)
     end
 
     describe 'rescheduling' do
-      let(:event) { create(:event, start_date: start_date, end_date: start_date + 5.days) }
-      let(:que_job) { QueJobs.where("kwargs::jsonb <@ '{\"event_id\": #{event.id}}'::jsonb").last }
+      let(:event) { create(:event_with_members, start_date: start_date, end_date: start_date + 5.days) }
+      let!(:que_job) { QueJobs.where("kwargs::jsonb <@ '{\"event_id\": #{event.id}}'::jsonb").last }
 
       context 'when it is more than 2 month until event start' do
         before do
@@ -33,7 +33,7 @@ RSpec.describe Que::ReportEventStatisticsJob, type: :job do
         let(:start_date) { 3.month.from_now(Time.zone.now) }
 
         it 'reschedules job' do
-          expect { subject }.to change { QueJobs.count }.by(2)
+          expect { subject }.to change { QueJobs.count }.by(1)
         end
 
         it 'has run_at in 2 month' do
