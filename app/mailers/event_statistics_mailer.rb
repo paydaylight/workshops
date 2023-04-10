@@ -12,6 +12,8 @@ class EventStatisticsMailer < ApplicationMailer
 
     return if @physical_spots.zero?
 
+    @program_coordinator = GetSetting.email(@event.location, 'program_coordinator')
+
     recipients = []
 
     @event.organizers.each do |organizer|
