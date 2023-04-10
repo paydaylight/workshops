@@ -19,6 +19,7 @@ class Event < ApplicationRecord
   before_update :update_name
   after_create :update_legacy_db
   after_create :enqueue_statistics_job
+  after_create :enqueue_attendance_confirmation_job
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
@@ -87,24 +88,24 @@ class Event < ApplicationRecord
   end
 
   def check_event_type
-    if GetSetting.site_setting('event_types').include?(event_type)
-      return true
-    else
+    return true if GetSetting.site_setting('event_types').include?(event_type)
+
+
       types = GetSetting.site_setting('event_types').join(', ')
       errors.add(:event_type, "- event type must be one of: #{types}")
       return false
-    end
+
   end
 
   def has_long_name
     return if data_import
-    if name && name.length > 68
+    return unless name && name.length > 68
       if short_name.blank?
         errors.add(:short_name, "- if the name is > 68 characters, a shorter name is required to fit on name tags")
       elsif short_name.length > 68
         errors.add(:short_name, "must be less than 68 characters long")
       end
-    end
+
   end
 
   def self.years
@@ -112,9 +113,9 @@ class Event < ApplicationRecord
   end
 
   def starts_before_ends
-    if (start_date && end_date) && (start_date > end_date)
+    return unless (start_date && end_date) && (start_date > end_date)
       errors.add(:start_date, "- event must begin before it ends")
-    end
+
   end
 
   def set_sync_time
@@ -144,6 +145,12 @@ class Event < ApplicationRecord
 
   def enqueue_statistics_job
     Que::ReportEventStatisticsJob.new({}).schedule_job(self)
+  end
+
+  def enqueue_attendance_confirmation_job
+    return unless hybrid_or_physical?
+
+    Que::DoubleCheckAttendanceJob.enqueue(event_id: id, job_options: { run_at: one_month_before_start })
   end
 
   def clean_data

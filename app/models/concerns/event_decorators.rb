@@ -229,14 +229,18 @@ module EventDecorators
   end
 
   def online?
-    self.event_format == 'Online'
+    event_format == 'Online'
   end
 
   def hybrid?
-    self.event_format == 'Hybrid'
+    event_format == 'Hybrid'
   end
 
   def physical?
-    self.event_format == 'Physical'
+    event_format == 'Physical'
+  end
+
+  def hybrid_or_physical?
+    hybrid? || physical?
   end
 end

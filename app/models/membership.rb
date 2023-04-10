@@ -82,7 +82,11 @@ class Membership < ApplicationRecord
   end
 
   def in_person?
-    IN_PERSON_ROLES.includes?(role)
+    IN_PERSON_ROLES.include?(role)
+  end
+
+  def confirmed?
+    attendance == 'Confirmed'
   end
 
   private

@@ -17,6 +17,13 @@ class RsvpController < ApplicationController
     end
   end
 
+  # GET /rsvp/confirm/:otp
+  def confirm_attendance
+    @membership = @invitation.membership
+
+    redirect_to_feedback_path(@membership.id) unless attendance_requires_confirmation?
+  end
+
   # GET /rsvp/email/:otp
   # POST /rsvp/email/:otp
   def email
@@ -64,23 +71,30 @@ class RsvpController < ApplicationController
   # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation.reload)
-    @years = (1930..Date.current.year).to_a.reverse
-    set_default_dates
 
-    return unless request.post? && @rsvp.validate_form(yes_params)
-    update_and_redirect(rsvp: :accept)
+    if request.get?
+      @years = (1930..Date.current.year).to_a.reverse
+      set_default_dates
+    end
+
+    update_and_redirect(rsvp: :accept) if request.post? && @rsvp.validate_form(yes_params)
   end
 
   # GET /rsvp/yes-online/:otp
   # POST /rsvp/yes-online/:otp
   def yes_online
     @rsvp = RsvpForm.new(@invitation.reload)
-    @years = (1930..Date.current.year).to_a.reverse
+    @years = (1930..Date.current.year).to_a.reverse if request.get?
 
-    if request.post? && @rsvp.validate_form(yes_params)
-      update_and_redirect(rsvp: :accept) and return
-    end
+    return update_and_redirect(rsvp: :accept) if request.post? && @rsvp.validate_form(yes_params)
+
     render "yes-online"
+  end
+
+  # To double-check confirmed members' attendance
+  # POST /rsvp/yes-confirm/:otp
+  def confirm_yes
+    update_and_redirect(rsvp: :confirm_attendance)
   end
 
   # GET /rsvp/no/:otp
@@ -99,11 +113,10 @@ class RsvpController < ApplicationController
   # POST /rsvp/feedback
   def feedback
     return unless request.post?
+
     membership = Membership.find_by_id(feedback_params[:membership_id])
     message = feedback_params[:feedback_message]
-    unless message.blank?
-      EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message)
-    end
+    EmailSiteFeedbackJob.perform_later('RSVP', membership.id, message) unless message.blank?
     redirect_to post_feedback_url(membership),
                 success: 'Thanks for the feedback!'
   end
@@ -113,15 +126,16 @@ class RsvpController < ApplicationController
   def post_feedback_url(membership)
     user = User.find_by_email(membership.person.email)
     return new_user_registration_path if user.nil?
+
     sign_in_path
   end
 
   def set_organizer_message
-    if params[:rsvp].blank?
-      @organizer_message = ''
-    else
-      @organizer_message = message_params['organizer_message']
-    end
+    @organizer_message = if params[:rsvp].blank?
+                           ''
+                         else
+                           message_params['organizer_message']
+                         end
   end
 
   def set_default_dates
@@ -132,10 +146,13 @@ class RsvpController < ApplicationController
 
   def update_and_redirect(rsvp:)
     @invitation.organizer_message = @organizer_message
-    membership = @invitation.membership
     @invitation.send(rsvp) # sent to Invitation model
 
-    redirect_to rsvp_feedback_path(membership.id), success: 'Your attendance
+    redirect_to_feedback_path(@invitation.membership_id)
+  end
+
+  def redirect_to_feedback_path(membership_id)
+    redirect_to rsvp_feedback_path(membership_id), success: 'Your attendance
       status was successfully updated. Thanks for your reply!'.squish
   end
 
@@ -193,9 +210,11 @@ class RsvpController < ApplicationController
 
   def set_yes_path(event)
     path_param = { otp: otp_params }
-    if event.online? || @invitation.virtual?
-      return rsvp_yes_online_path(path_param)
-    end
+    return rsvp_yes_online_path(path_param) if event.online? || @invitation.virtual?
     rsvp_yes_path(path_param)
+  end
+
+  def attendance_requires_confirmation?
+    @membership.confirmed? && @membership.in_person? && @membership.event.hybrid_or_physical?
   end
 end

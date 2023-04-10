@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 module Que
-  class DoubleCheckRSVPJob < Job
+  class DoubleCheckAttendanceJob < Job
     def run(event_id:, step: :rsvp_one_month_before_event)
       @event = Event.find(event_id)
 
-      case step
+      return unless @event.hybrid_or_physical?
+
+      case step.to_sym
       when :rsvp_one_month_before_event
         rsvp_one_month_before_event
       when :rsvp_two_weeks_before_event
@@ -17,6 +19,7 @@ module Que
       end
     rescue StandardError => e
       notify_sysadmin(e.message, step: step, error_object: e)
+      raise e
     end
 
     private
@@ -38,7 +41,7 @@ module Que
     def alert_staff
       return if email_group.count.zero?
 
-      DoubleCheckRSVPMailer.alert_staff(event_id: event.id).deliver_now
+      AttendanceConfirmationMailer.alert_staff(event_id: event.id).deliver_now
     end
 
     def enqueue_step(step:, run_at:)
@@ -57,13 +60,12 @@ module Que
 
     def send_emails
       email_group.each do |invitation|
-        DoubleCheckRSVPMailer.remind(invitation_id: invitation.id).deliver_now
+        AttendanceConfirmationMailer.remind(invitation_id: invitation.id).deliver_now
       end
     end
 
     def email_group
-      Invitation.joins(:membership).where(memberships: { attendance: 'Confirmed', role: Membership::IN_PERSON_ROLES })
-      # event.memberships.joins(:invitation).confirmed.where(role: Membership::IN_PERSON_ROLES)
+      Invitation.no_rsvp_from_confirmed.with_event(event_id: event.id)
     end
 
     def today_in_event_tz
