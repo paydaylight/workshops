@@ -7,15 +7,10 @@
 class RsvpController < ApplicationController
   before_action :set_invitation, except: [:feedback]
   before_action :after_selection, except: [:index, :feedback]
+  before_action :set_rsvp_page_variables, only: [:index, :confirm_attendance]
 
   # GET /rsvp/:otp
-  def index
-    unless @invitation.event.nil?
-      @inv_event = @invitation.event
-      @location = GetSetting.org_name(@inv_event.location)
-      @pc_email = GetSetting.email(@inv_event.location, 'program_coordinator')
-    end
-  end
+  def index; end
 
   # GET /rsvp/confirm/:otp
   def confirm_attendance
@@ -122,6 +117,14 @@ class RsvpController < ApplicationController
   end
 
   private
+
+  def set_rsvp_page_variables
+    if @invitation.event.present?
+      @event = @invitation.event
+      @location = GetSetting.org_name(@event.location)
+      @program_coordinator = GetSetting.email(@event.location, 'program_coordinator')
+    end
+  end
 
   def post_feedback_url(membership)
     user = User.find_by_email(membership.person.email)

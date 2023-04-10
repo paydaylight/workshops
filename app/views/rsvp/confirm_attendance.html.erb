@@ -1,13 +1,1 @@
-<div class="jumbotron answers">
-  <div class="d-flex justify-content-center flex-column flex-md-row">
-    <div class="p-2 flex-fill">
-      <a href="<%= rsvp_yes_confirm_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-success">Yes</a>
-    </div>
-    <div class="p-2 flex-fill">
-      <a href="<%= rsvp_maybe_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-warning">Maybe</a>
-    </div>
-    <div class="p-2 flex-fill">
-      <a href="<%= rsvp_no_path(@invitation.code) %>" role="button" class="btn btn-lg btn-block btn-danger">No</a>
-    </div>
-  </div>
-</div>
+<%= render partial: 'rsvp_page', locals: { body: 'rsvp/confirm_attendance/body', questions: 'rsvp/confirm_attendance/questions' } %>
