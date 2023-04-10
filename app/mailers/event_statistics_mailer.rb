@@ -4,11 +4,14 @@ class EventStatisticsMailer < ApplicationMailer
   def notify(event_id:)
     @event = Event.find(event_id)
 
-    @confirmed_count = Membership.confirmed.where(event: @event).count
-    @invited_count = Membership.invited.where(event: @event).count
-    @undecided_count = Membership.undecided.where(event: @event).count
-    @physical_spots = @event.max_participants - @event.num_invited_in_person
+    @confirmed_count = Membership.in_person.confirmed.where(event: @event).count
+    @invited_count = Membership.in_person.invited.where(event: @event).count
+    @undecided_count = Membership.in_person.undecided.where(event: @event).count
+    @physical_spots = @event.max_participants - @confirmed_count - @invited_count - @undecided_count
     @virtual_spots = @event.max_virtual - @event.num_invited_virtual
+
+    return if @physical_spots.zero?
+
     recipients = []
 
     @event.organizers.each do |organizer|

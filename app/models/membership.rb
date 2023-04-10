@@ -50,6 +50,7 @@ class Membership < ApplicationRecord
   scope :undecided, -> { where(attendance: 'Undecided') }
   scope :not_yet_invited, -> { where(attendance: 'Not Yet Invited') }
   scope :declined, -> { where(attendance: 'Declined') }
+  scope :in_person, -> { where(role: IN_PERSON_ROLES) }
 
   include SharedDecorators
 
