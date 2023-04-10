@@ -148,8 +148,6 @@ class Event < ApplicationRecord
   end
 
   def enqueue_attendance_confirmation_job
-    return unless hybrid_or_physical?
-
     Que::DoubleCheckAttendanceJob.enqueue(event_id: id, job_options: { run_at: one_month_before_start })
   end
 

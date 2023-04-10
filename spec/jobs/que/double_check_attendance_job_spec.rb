@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Que::DoubleCheckAttendanceJob, type: :job do
+
+  subject { described_class.run(event_id: event.id) }
+
   let(:event) do
     create(
       :event,
@@ -10,11 +13,12 @@ RSpec.describe Que::DoubleCheckAttendanceJob, type: :job do
       end_date: end_date,
       max_virtual: 10,
       max_participants: 10,
-      event_format: 'Hybrid'
+      event_format: format
     )
   end
   let(:start_date) { 3.month.since(Date.today) }
   let(:end_date) { start_date + 5.days }
+  let(:format) { 'Hybrid' }
 
   def create_membership(role, attendance: 'Confirmed')
     create(:membership, role: role, attendance: attendance, event: event)
@@ -42,16 +46,26 @@ RSpec.describe Que::DoubleCheckAttendanceJob, type: :job do
   end
 
   describe '.enqueue' do
-    context 'when error' do
-      subject { described_class.run(event_id: event.id) }
+    context 'when event is Online' do
+      let(:format) { 'Online' }
 
+      it 'does not send emails' do
+        expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+      end
+
+      it 'does not schedule next step' do
+        expect { subject }.not_to change { QueJobs.count }
+      end
+    end
+
+    context 'when error' do
       before do
         allow(AttendanceConfirmationMailer).to receive(:remind).and_raise(ActiveRecord::RecordNotFound)
         allow(StaffMailer).to receive(:notify_sysadmin).and_call_original
       end
 
       it 'sends error report to sysadmin' do
-        subject
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
 
         expect(StaffMailer).to have_received(:notify_sysadmin)
       end
@@ -60,65 +74,105 @@ RSpec.describe Que::DoubleCheckAttendanceJob, type: :job do
     describe 'step: :rsvp_one_month_before_event' do
       subject { described_class.run(event_id: event.id, step: :rsvp_one_month_before_event) }
 
-      it 'reminds confirmed members about upcoming workshop' do
-        subject
+      context 'when it is <= 2 weeks until workshop' do
+        let(:start_date) { Date.today + 2.weeks }
 
-        expect(ActionMailer::Base.deliveries.count).to eq(3)
+        it('does not send email') { expect { subject }.not_to change { ActionMailer::Base.deliveries.count } }
+
+        it 'schedules next step' do
+          expect { subject }.to change { QueJobs.count }.by(1)
+
+          expect(QueJobs.last.kwargs['step']).to eq('rsvp_two_weeks_before_event')
+        end
       end
 
-      it 'schedules next step' do
-        expect { subject }.to change { QueJobs.count }.by(1)
-      end
+      context 'when it is > 2 weeks until event start' do
+        let(:start_date) { Date.today + 3.weeks }
 
-      it 'schedules step: :rsvp_two_weeks_before_event' do
-        allow(described_class).to receive(:enqueue)
+        it 'reminds confirmed members about upcoming workshop' do
+          subject
 
-        subject
+          expect(ActionMailer::Base.deliveries.count).to eq(3)
+        end
 
-        expect(described_class).to have_received(:enqueue)
-          .with(
-            event_id: event.id,
-            step: :rsvp_two_weeks_before_event,
-            job_options: { run_at: event.two_weeks_before_start }
-          )
+        it 'schedules next step' do
+          expect { subject }.to change { QueJobs.count }.by(1)
+
+          expect(QueJobs.last.kwargs['step']).to eq('rsvp_two_weeks_before_event')
+        end
+
+        it 'schedules step: :rsvp_two_weeks_before_event' do
+          allow(described_class).to receive(:enqueue)
+
+          subject
+
+          expect(described_class).to have_received(:enqueue)
+                                       .with(
+                                         event_id: event.id,
+                                         step: :rsvp_two_weeks_before_event,
+                                         job_options: { run_at: event.two_weeks_before_start }
+                                       )
+        end
       end
     end
 
     describe 'step: :rsvp_two_weeks_before_event' do
       subject { described_class.run(event_id: event.id, step: :rsvp_two_weeks_before_event) }
 
-      it 'reminds confirmed members who did not replied in step before' do
-        participant_invitation.delete
+      context 'when it is workshop day' do
+        let(:start_date) { Date.today }
 
-        subject
+        it('does not send email') { expect { subject }.not_to change { ActionMailer::Base.deliveries.count } }
 
-        expect(ActionMailer::Base.deliveries.count).to eq(2)
+        it 'schedules next step' do
+          expect { subject }.to change { QueJobs.count }.by(1)
+
+          expect(QueJobs.last.kwargs['step']).to eq('alert_staff')
+        end
       end
 
-      it 'schedules next step' do
-        expect { subject }.to change { QueJobs.count }.by(1)
-      end
+      context 'when it is at least 1 day before event' do
+        let(:start_date) { Date.today + 1.day }
 
-      it 'schedules step: :alert_staff' do
-        allow(described_class).to receive(:enqueue)
+        it 'reminds confirmed members who did not replied in step before' do
+          participant_invitation.confirm_attendance
 
-        subject
+          subject
 
-        expect(described_class).to have_received(:enqueue)
-          .with(
-            event_id: event.id,
-            step: :alert_staff,
-            job_options: { run_at: event.one_week_before_start }
-          )
+          expect(ActionMailer::Base.deliveries.count).to eq(2)
+        end
+
+        it 'schedules next step' do
+          expect { subject }.to change { QueJobs.count }.by(1)
+
+          expect(QueJobs.last.kwargs['step']).to eq('alert_staff')
+        end
+
+        it 'schedules step: :alert_staff' do
+          allow(described_class).to receive(:enqueue)
+
+          subject
+
+          expect(described_class).to have_received(:enqueue)
+                                       .with(
+                                         event_id: event.id,
+                                         step: :alert_staff,
+                                         job_options: { run_at: event.one_week_before_start }
+                                       )
+        end
       end
     end
 
     describe 'step: :alert_staff' do
       subject { described_class.run(event_id: event.id, step: :alert_staff) }
 
+      before do
+        create(:user, :staff, location: event.location)
+      end
+
       context 'when there are still members who did not RSVP' do
         it 'sends out email to staff' do
-          allow(AttendanceConfirmationMailer).to receive(:alert_staff)
+          allow(AttendanceConfirmationMailer).to receive(:alert_staff).and_call_original
 
           subject
 
@@ -128,9 +182,9 @@ RSpec.describe Que::DoubleCheckAttendanceJob, type: :job do
 
       context 'when all members RSVP' do
         before do
-          participant_invitation.delete
-          organizer_invitation.delete
-          contact_organizer_invitation.delete
+          participant_invitation.confirm_attendance
+          organizer_invitation.confirm_attendance
+          contact_organizer_invitation.confirm_attendance
         end
 
         it 'does not notify staff' do
