@@ -107,6 +107,8 @@ Rails.application.configure do
     password:             ENV['MANDRILL_API_KEY']
   }
 
+  Rails.application.routes.default_url_options[:host] = ENV['APPLICATION_HOST']
+
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 

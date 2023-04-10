@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  default_url_options host: ENV['APPLICATION_HOST']
-
   root 'home#index'
 
   # Devise (login/logout)

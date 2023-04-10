@@ -19,6 +19,7 @@ module Que
       end
     rescue StandardError => e
       notify_sysadmin(e.message, step: step, error_object: e)
+
       raise e
     end
 
