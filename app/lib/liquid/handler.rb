@@ -22,7 +22,7 @@ module Liquid
       @view = view
       @controller = @view.controller
     end
-    
+
     def render(template, _options)
       context = if @controller.respond_to?(:liquid_context, true)
                   @controller.send(:liquid_context)
