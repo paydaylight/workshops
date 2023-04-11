@@ -50,7 +50,28 @@ RSpec.describe RsvpController, type: :controller do
         get :index, params: { otp: '123' }
 
         expect(assigns(:invitation)).to be_a(InvitationChecker)
-        expect(response).to render_template("rsvp/_invitation_errors")
+        expect(response).to render_template('rsvp/_invitation_errors')
+      end
+    end
+  end
+
+  describe 'GET #confirm_attendance' do
+    let(:event) { create(:event, event_format: 'Physical', max_participants: 1, start_date: 5.days.from_now, end_date: 10.days.from_now) }
+    let(:membership) { create(:membership, attendance: 'Confirmed', role: 'Participant', event: event) }
+    let(:invitation) { create(:invitation, membership: membership) }
+
+    it 'validates the OTP' do
+      get :confirm_attendance, params: { otp: invitation.code }
+
+      expect(assigns(:invitation)).to eq(invitation)
+      expect(response).to render_template(:confirm_attendance)
+    end
+
+    context 'when invalid OTP' do
+      it 'redirects to error page' do
+        get :confirm_attendance, params: { otp: '123' }
+
+        expect(response).to render_template('rsvp/_invitation_errors')
       end
     end
   end
@@ -142,7 +163,7 @@ RSpec.describe RsvpController, type: :controller do
         post :email, params: { otp: @invitation.code, 'email_form' =>
                                     {'person' => { email: 'foo' }}}
         expect(response).to render_template(:email)
-        expect(response).to render_template("rsvp/_validation_errors")
+        expect(response).to render_template('rsvp/_validation_errors')
       end
     end
 
@@ -208,7 +229,7 @@ RSpec.describe RsvpController, type: :controller do
       post :confirm_email, params: confirm_params
 
       expect(response).to render_template(:confirm_email)
-      expect(response).to render_template("rsvp/_validation_errors")
+      expect(response).to render_template('rsvp/_validation_errors')
     end
 
     context 'valid confirmation codes' do
@@ -361,6 +382,20 @@ RSpec.describe RsvpController, type: :controller do
       post :yes_online, params: { otp: 'foo', rsvp: online_params }
 
       expect(response).to redirect_to(rsvp_otp_path('foo'))
+    end
+  end
+
+  describe 'POST #yes_confirm' do
+    before do
+      post :yes_confirm, params: { otp: @invitation.code }
+    end
+
+    it 'changes membership attendance to Confirmed' do
+      expect(Membership.find(@membership.id).attendance).to eq('Confirmed')
+    end
+
+    it 'forwards to feedback form' do
+      expect(response).to redirect_to(rsvp_feedback_path(@membership.id))
     end
   end
 

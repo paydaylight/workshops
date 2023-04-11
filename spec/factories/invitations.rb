@@ -5,7 +5,7 @@ FactoryBot.define do
     association :membership, factory: :membership
     invited_by { 'FactoryBot' }
     code { SecureRandom.urlsafe_base64(37) }
-    expires { nil }
+    expires { 1.day.from_now }
     invited_on { Date.today }
     used_on { nil }
   end

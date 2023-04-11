@@ -5,18 +5,21 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class RsvpController < ApplicationController
-  before_action :set_invitation, except: [:feedback]
-  before_action :after_selection, except: [:index, :feedback]
-  before_action :set_rsvp_page_variables, only: [:index, :confirm_attendance]
+  before_action :set_invitation, except: %i[feedback]
+  before_action :after_selection, except: %i[index confirm_attendance feedback]
+  before_action :set_rsvp_page_variables, only: %i[index confirm_attendance]
 
   # GET /rsvp/:otp
   def index; end
 
   # GET /rsvp/confirm/:otp
   def confirm_attendance
-    @membership = @invitation.membership
+    # Invitation code is probably not valid
+    return unless @invitation.respond_to?(:membership)
 
-    redirect_to_feedback_path(@membership.id) unless attendance_requires_confirmation?
+    membership = @invitation.membership
+
+    redirect_to rsvp_path(otp: otp_params) unless membership.attendance_requires_confirmation?
   end
 
   # GET /rsvp/email/:otp
@@ -31,6 +34,7 @@ class RsvpController < ApplicationController
     end
 
     render 'confirm_email' and return if @person.pending_replacement?
+
     SyncMember.new(@invitation.membership, is_rsvp: true)
   end
 
@@ -43,7 +47,7 @@ class RsvpController < ApplicationController
     @email_form = EmailForm.new(@person)
     if @email_form.verify_email_change(confirm_email_params)
       redirect_to set_yes_path(@invitation.membership.event),
-        success: 'E-mail updated! Thank you.' and return
+                  success: 'E-mail updated! Thank you.' and return
     end
   end
 
@@ -53,12 +57,12 @@ class RsvpController < ApplicationController
     ConfirmEmailChange.where(replace_person_id: person.id,
                              replace_email: person.email).destroy_all
     if ConfirmEmailChange.where(replace_person_id: person.id,
-                             replace_email: person.email).empty?
+                                replace_email: person.email).empty?
       redirect_to rsvp_email_path(otp: otp_params),
-                              success: 'E-mail change cancelled.'
+                  success: 'E-mail change cancelled.'
     else
       redirect_to rsvp_email_path(otp: otp_params),
-                              error: 'Unable to cancel e-mail change :(.'
+                  error: 'Unable to cancel e-mail change :(.'
     end
   end
 
@@ -66,11 +70,8 @@ class RsvpController < ApplicationController
   # POST /rsvp/yes/:otp
   def yes
     @rsvp = RsvpForm.new(@invitation.reload)
-
-    if request.get?
-      @years = (1930..Date.current.year).to_a.reverse
-      set_default_dates
-    end
+    @years = (1930..Date.current.year).to_a.reverse
+    set_default_dates
 
     update_and_redirect(rsvp: :accept) if request.post? && @rsvp.validate_form(yes_params)
   end
@@ -79,16 +80,16 @@ class RsvpController < ApplicationController
   # POST /rsvp/yes-online/:otp
   def yes_online
     @rsvp = RsvpForm.new(@invitation.reload)
-    @years = (1930..Date.current.year).to_a.reverse if request.get?
+    @years = (1930..Date.current.year).to_a.reverse
 
     return update_and_redirect(rsvp: :accept) if request.post? && @rsvp.validate_form(yes_params)
 
-    render "yes-online"
+    render 'yes-online'
   end
 
   # To double-check confirmed members' attendance
   # POST /rsvp/yes-confirm/:otp
-  def confirm_yes
+  def yes_confirm
     update_and_redirect(rsvp: :confirm_attendance)
   end
 
@@ -119,11 +120,11 @@ class RsvpController < ApplicationController
   private
 
   def set_rsvp_page_variables
-    if @invitation.event.present?
-      @event = @invitation.event
-      @location = GetSetting.org_name(@event.location)
-      @program_coordinator = GetSetting.email(@event.location, 'program_coordinator')
-    end
+    return unless @invitation.event.present?
+
+    @event = @invitation.event
+    @location = GetSetting.org_name(@event.location)
+    @program_coordinator = GetSetting.email(@event.location, 'program_coordinator')
   end
 
   def post_feedback_url(membership)
@@ -151,11 +152,7 @@ class RsvpController < ApplicationController
     @invitation.organizer_message = @organizer_message
     @invitation.send(rsvp) # sent to Invitation model
 
-    redirect_to_feedback_path(@invitation.membership_id)
-  end
-
-  def redirect_to_feedback_path(membership_id)
-    redirect_to rsvp_feedback_path(membership_id), success: 'Your attendance
+    redirect_to rsvp_feedback_path(@invitation.membership_id), success: 'Your attendance
       status was successfully updated. Thanks for your reply!'.squish
   end
 
@@ -191,14 +188,14 @@ class RsvpController < ApplicationController
 
   def yes_params
     params.require(:rsvp).permit(
-      membership: [:arrival_date, :departure_date,
-        :own_accommodation, :has_guest, :guest_disclaimer, :special_info,
-        :share_email, :share_email_hotel, :role],
+      membership: %i[arrival_date departure_date
+                     own_accommodation has_guest guest_disclaimer special_info
+                     share_email share_email_hotel role],
       person: [:salutation, :firstname, :lastname, :gender,
-        :affiliation, :department, :title, :academic_status, :phd_year, :email,
-        :url, :phone, :address1, :address2, :address3, :city, :region,
-        :postal_code, :country, :emergency_contact, :emergency_phone,
-        :biography, :research_areas, grants: []],
+               :affiliation, :department, :title, :academic_status, :phd_year, :email,
+               :url, :phone, :address1, :address2, :address3, :city, :region,
+               :postal_code, :country, :emergency_contact, :emergency_phone,
+               :biography, :research_areas, grants: []]
     )
   end
 
@@ -214,10 +211,7 @@ class RsvpController < ApplicationController
   def set_yes_path(event)
     path_param = { otp: otp_params }
     return rsvp_yes_online_path(path_param) if event.online? || @invitation.virtual?
-    rsvp_yes_path(path_param)
-  end
 
-  def attendance_requires_confirmation?
-    @membership.confirmed? && @membership.in_person? && @membership.event.hybrid_or_physical?
+    rsvp_yes_path(path_param)
   end
 end

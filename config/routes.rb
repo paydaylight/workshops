@@ -91,7 +91,7 @@ Rails.application.routes.draw do
   match '/rsvp/cancel/:otp' => 'rsvp#cancel', as: :rsvp_cancel, via: [:get, :post]
   match '/rsvp/yes/:otp' => 'rsvp#yes', as: :rsvp_yes, via: [:get, :post]
   # For double-checking confirmed members' attendance
-  post '/rsvp/yes-confirm/:otp' => 'rsvp#confirm_yes', as: :rsvp_yes_confirm
+  post '/rsvp/yes-confirm/:otp' => 'rsvp#yes_confirm', as: :rsvp_yes_confirm
   match '/rsvp/yes-online/:otp' => 'rsvp#yes_online', as: :rsvp_yes_online, via: [:get, :post]
   match '/rsvp/no/:otp' => 'rsvp#no', as: :rsvp_no, via: [:get, :post]
   match '/rsvp/maybe/:otp' => 'rsvp#maybe', as: :rsvp_maybe, via: [:get, :post]
