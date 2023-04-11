@@ -1,4 +1,4 @@
-Dear <%= @contact_organizers_names || 'organizers' %>,
+Dear <%= @contact_organizers_names.empty? ? 'organizers' : @contact_organizers_names %>,
 
 In reviewing our registration database for <%= @event.location %> Workshop <%= @event.code %>, you currently have <%= @confirmed_count %> confirmed onsite participants, <%= @undecided_count %> maybe's and <%= @invited_count %> invited onsite participants who have not replied.
 
