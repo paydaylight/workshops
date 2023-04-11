@@ -90,11 +90,9 @@ class Event < ApplicationRecord
   def check_event_type
     return true if GetSetting.site_setting('event_types').include?(event_type)
 
-
-      types = GetSetting.site_setting('event_types').join(', ')
-      errors.add(:event_type, "- event type must be one of: #{types}")
-      return false
-
+    types = GetSetting.site_setting('event_types').join(', ')
+    errors.add(:event_type, "- event type must be one of: #{types}")
+    false
   end
 
   def has_long_name
