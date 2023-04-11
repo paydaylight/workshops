@@ -30,6 +30,8 @@ class EventStatisticsMailer < ApplicationMailer
       cc << to_email_address(organizer)
     end
 
+    cc -= recipients
+
     subject = I18n.t('email.event_statistics.subject', location: @event.location, event_code: @event.code)
 
     mail(to: recipients.join(', '), cc: cc.join(', '), subject: subject)
