@@ -8,15 +8,17 @@ class EventStatisticsMailer < ApplicationMailer
     @invited_count = Membership.in_person.invited.where(event: @event).count
     @undecided_count = Membership.in_person.undecided.where(event: @event).count
     @physical_spots = @event.max_participants - @confirmed_count - @invited_count - @undecided_count
-    @virtual_spots = @event.max_virtual - @event.num_invited_virtual
 
     return if @physical_spots.zero?
 
     @program_coordinator = GetSetting.email(@event.location, 'program_coordinator')
+    @contact_organizers = @event.contact_organizers
+    @contact_organizers_names = @contact_organizers.map(&:dear_name).join(', ')
 
     recipients = []
+    cc = []
 
-    @event.organizers.each do |organizer|
+    @contact_organizers.each do |organizer|
       recipients << to_email_address(organizer)
     end
 
@@ -24,8 +26,12 @@ class EventStatisticsMailer < ApplicationMailer
       recipients << to_email_address(staff)
     end
 
+    @event.organizers.each do |organizer|
+      cc << to_email_address(organizer)
+    end
+
     subject = I18n.t('email.event_statistics.subject', location: @event.location, event_code: @event.code)
 
-    mail(to: recipients.join(', '), subject: subject)
+    mail(to: recipients.join(', '), cc: cc.join(', '), subject: subject)
   end
 end
