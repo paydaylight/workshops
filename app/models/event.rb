@@ -149,7 +149,7 @@ class Event < ApplicationRecord
 
   def enqueue_attendance_confirmation_job
     next_run = Rails.env.development? ? 10.minutes.from_now : one_month_before_start
-    
+
     Que::DoubleCheckAttendanceJob.enqueue(event_id: id, job_options: { run_at: next_run })
   end
 
