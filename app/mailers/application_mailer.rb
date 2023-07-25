@@ -23,6 +23,8 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
 
   def to_email_address(user)
+    return '' if user.blank?
+
     "\"#{user.name}\" <#{user.email}>"
   end
 end

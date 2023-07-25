@@ -16,7 +16,6 @@ class EventStatisticsMailer < ApplicationMailer
     @contact_organizers_names = @contact_organizers.map(&:dear_name).join(', ')
 
     recipients = []
-    cc = []
 
     @contact_organizers.each do |organizer|
       recipients << to_email_address(organizer)
@@ -26,14 +25,10 @@ class EventStatisticsMailer < ApplicationMailer
       recipients << to_email_address(staff)
     end
 
-    @event.organizers.each do |organizer|
-      cc << to_email_address(organizer)
-    end
-
-    cc -= recipients
+    cc = GetSetting.email(@event.location, 'event_statistics_cc')
 
     subject = I18n.t('email.event_statistics.subject', location: @event.location, event_code: @event.code)
 
-    mail(to: recipients.join(', '), cc: cc.join(', '), subject: subject)
+    mail(to: recipients, cc: cc, subject: subject)
   end
 end
