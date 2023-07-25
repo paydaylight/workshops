@@ -21,4 +21,10 @@
 class ApplicationMailer < ActionMailer::Base
   default from: GetSetting.site_email('application_email')
   layout 'mailer'
+
+  def to_email_address(user)
+    return '' if user.blank?
+
+    "\"#{user.name}\" <#{user.email}>"
+  end
 end

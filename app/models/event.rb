@@ -18,6 +18,7 @@ class Event < ApplicationRecord
   before_save :clean_data
   before_update :update_name
   after_create :update_legacy_db
+  after_create :enqueue_statistics_job
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
@@ -71,6 +72,10 @@ class Event < ApplicationRecord
       where("event_type = ? AND template = ?", kind.titleize.singularize, false).order(:start_date)
     end
   }
+
+  def staff_at_location
+    User.staff.where(location: location)
+  end
 
   def attendance_and_role(role:, attendance:)
     memberships.joins(:person).where(role: role, attendance: attendance)
@@ -134,6 +139,10 @@ class Event < ApplicationRecord
     return unless Rails.env.production?
 
     LegacyConnector.new.add_event(self)
+  end
+
+  def enqueue_statistics_job
+    Que::ReportEventStatisticsJob.new({}).schedule_job(self)
   end
 
   def clean_data
