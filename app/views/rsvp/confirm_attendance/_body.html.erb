@@ -1,0 +1,11 @@
+<div class="row">
+  <div class='col-md-12'>
+    <p class='lead text-center'>
+      Please confirm attendance to the
+      <%= @event.event_type %>, <%= @event.code %>:<br>
+      "<%= link_to @event.name, event_path(@event), target: '_new' %>", on
+      <%= @event.dates(:long) %>.<br>
+    </p>
+    <h3 id="attend">Will you attend?</h3>
+  </div>
+</div>

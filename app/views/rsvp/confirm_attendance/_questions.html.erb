@@ -1,0 +1,13 @@
+<div class="jumbotron answers">
+  <div class="d-flex justify-content-center flex-column flex-md-row">
+    <div class="p-2 flex-fill">
+      <%= link_to 'Yes', rsvp_yes_confirm_path(@invitation.code), method: :post, class: 'btn btn-lg btn-block btn-success', role: 'button' %>
+    </div>
+    <div class="p-2 flex-fill">
+      <%= link_to 'Maybe', rsvp_maybe_path(@invitation.code), method: :post, class: "btn btn-lg btn-block btn-warning", role: 'button'  %>
+    </div>
+    <div class="p-2 flex-fill">
+      <%= link_to 'No', rsvp_no_path(@invitation.code), method: :post, class: 'btn btn-lg btn-block btn-danger', role: 'button' %>
+    </div>
+  </div>
+</div>

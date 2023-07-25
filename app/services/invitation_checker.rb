@@ -17,7 +17,7 @@ class InvitationChecker
   end
 
   def find_invitation
-    invitation = Invitation.find_by_code(local_otp) || check_legacy_database
+    invitation = Invitation.find_by(code: local_otp) || check_legacy_database
     validate(invitation) if invitation
     invitation || self
   end

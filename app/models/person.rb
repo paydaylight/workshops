@@ -7,6 +7,12 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class Person < ApplicationRecord
+  # app/models/concerns/person_decorators.rb
+  include PersonDecorators
+  include SharedDecorators
+
+  include UserEmailUtils
+
   attr_accessor :is_rsvp, :is_online_rsvp, :member_import, :is_organizer_rsvp, :region_required
 
   has_many :memberships, dependent: :destroy
@@ -41,12 +47,6 @@ class Person < ApplicationRecord
   validates :region, presence: { message: '← region field cannot be blank'
             }, if: :region_required?
   validates :academic_status, presence: true, if: :is_rsvp
-
-
-  # app/models/concerns/person_decorators.rb
-  include PersonDecorators
-  include SharedDecorators
-
 
   def is_rsvp_but_not_online
     is_rsvp && !is_online_rsvp

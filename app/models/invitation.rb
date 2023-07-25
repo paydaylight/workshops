@@ -16,6 +16,11 @@ class Invitation < ApplicationRecord
   after_initialize :generate_code
   before_save :update_times
 
+  scope :no_rsvp_from_confirmed, lambda {
+    joins(:membership).where(memberships: { attendance: 'Confirmed', role: Membership::IN_PERSON_ROLES })
+  }
+  scope :with_event, ->(event_id:) { joins(:membership).where(memberships: { event_id: event_id }) }
+
   def generate_code
     self.code = SecureRandom.urlsafe_base64(37) if self.code.blank?
   end
@@ -67,13 +72,22 @@ class Invitation < ApplicationRecord
 
   def accept
     update_membership('Confirmed')
-    EmailParticipantConfirmationJob.perform_later(membership.id)
-    destroy
+    EmailParticipantConfirmationJob.perform_later(membership_id)
+    destroy unless membership.in_person?
+  end
+
+  def confirm_attendance
+    ActiveRecord::Base.transaction do
+      update_membership('Confirmed')
+      destroy
+    end
   end
 
   def decline
-    update_membership('Declined')
-    destroy
+    ActiveRecord::Base.transaction do
+      update_membership('Declined')
+      destroy
+    end
   end
 
   def maybe

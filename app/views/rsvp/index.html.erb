@@ -1,12 +1,1 @@
-<div class="row invitation-box container">
-  <div class="card">
-    <div class="rsvp-card-title">
-      <h2>Invitation to <%= @location %></h2>
-    </div>
-    <% if @invitation.errors.any? %>
-      <%= render 'invitation_errors' %>
-    <% else %>
-      <%= render 'questions' %>
-    <% end %>
-  </div>
-</div>
+<%= render partial: 'rsvp_page', locals: { body: 'rsvp/index/body', questions: 'rsvp/index/questions' } %>

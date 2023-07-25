@@ -19,6 +19,7 @@ class Event < ApplicationRecord
   before_update :update_name
   after_create :update_legacy_db
   after_create :enqueue_statistics_job
+  after_create :enqueue_attendance_confirmation_job
 
   validates :name, :start_date, :end_date, :location, :time_zone, presence: true
   validates :short_name, presence: true, if: :has_long_name
@@ -34,6 +35,7 @@ class Event < ApplicationRecord
 
   # app/models/concerns/event_decorators.rb
   include EventDecorators
+  include EventRSVP
 
   # Find by code
   def to_param
@@ -45,11 +47,11 @@ class Event < ApplicationRecord
   end
 
   scope :past, lambda {
-    where("end_date < ? AND template = ?", Date.current, false).order(:start_date).limit(100)
+    where('end_date < ? AND template = ?', Date.current, false).order(:start_date).limit(100)
   }
 
   scope :future, lambda {
-    where("end_date >= ? AND template = ?", Date.current, false).order(:start_date)
+    where('end_date >= ? AND template = ?', Date.current, false).order(:start_date)
   }
 
   scope :year, lambda { |year|
@@ -57,19 +59,19 @@ class Event < ApplicationRecord
   }
 
   scope :in_range, lambda  { |start_date, end_date|
-    where("start_date >= ? AND end_date <= ? AND template = false", start_date.to_s, end_date.to_s)
+    where('start_date >= ? AND end_date <= ? AND template = false', start_date.to_s, end_date.to_s)
   }
 
   scope :location, lambda { |location|
-    where("location = ? AND template = ?", location, false)
+    where('location = ? AND template = ?', location, false)
   }
 
   scope :kind, lambda { |kind|
     if kind == 'Research in Teams'
       # RITs stay plural
-      where("event_type = ? AND template = ?", 'Research in Teams', false).order(:start_date)
+      where('event_type = ? AND template = ?', 'Research in Teams', false).order(:start_date)
     else
-      where("event_type = ? AND template = ?", kind.titleize.singularize, false).order(:start_date)
+      where('event_type = ? AND template = ?', kind.titleize.singularize, false).order(:start_date)
     end
   }
 
@@ -86,23 +88,21 @@ class Event < ApplicationRecord
   end
 
   def check_event_type
-    if GetSetting.site_setting('event_types').include?(event_type)
-      return true
-    else
-      types = GetSetting.site_setting('event_types').join(', ')
-      errors.add(:event_type, "- event type must be one of: #{types}")
-      return false
-    end
+    return true if GetSetting.site_setting('event_types').include?(event_type)
+
+    types = GetSetting.site_setting('event_types').join(', ')
+    errors.add(:event_type, "- event type must be one of: #{types}")
+    false
   end
 
   def has_long_name
     return if data_import
-    if name && name.length > 68
-      if short_name.blank?
-        errors.add(:short_name, "- if the name is > 68 characters, a shorter name is required to fit on name tags")
-      elsif short_name.length > 68
-        errors.add(:short_name, "must be less than 68 characters long")
-      end
+    return unless name && name.length > 68
+
+    if short_name.blank?
+      errors.add(:short_name, '- if the name is > 68 characters, a shorter name is required to fit on name tags')
+    elsif short_name.length > 68
+      errors.add(:short_name, 'must be less than 68 characters long')
     end
   end
 
@@ -111,9 +111,9 @@ class Event < ApplicationRecord
   end
 
   def starts_before_ends
-    if (start_date && end_date) && (start_date > end_date)
-      errors.add(:start_date, "- event must begin before it ends")
-    end
+    return unless (start_date && end_date) && (start_date > end_date)
+
+    errors.add(:start_date, '- event must begin before it ends')
   end
 
   def set_sync_time
@@ -123,9 +123,9 @@ class Event < ApplicationRecord
   end
 
   def has_format
-    return if event_formats.include?(self.event_format)
-    errors.add(:event_format,
-                "must be set to one of #{event_formats.join(', ')}")
+    return if event_formats.include?(event_format)
+
+    errors.add(:event_format, "must be set to one of #{event_formats.join(', ')}")
   end
 
   def lock_date
@@ -145,16 +145,22 @@ class Event < ApplicationRecord
     Que::ReportEventStatisticsJob.new({}).schedule_job(self)
   end
 
+  def enqueue_attendance_confirmation_job
+    next_run = Rails.env.development? ? 10.minutes.from_now : one_month_before_start
+
+    Que::DoubleCheckAttendanceJob.enqueue(event_id: id, job_options: { run_at: next_run })
+  end
+
   def clean_data
     attributes.each_value { |v| v.strip! if v.respond_to? :strip! }
   end
 
   def set_max_defaults
     %w(participants virtual observers).each do |max_type|
-      max_setting = "max_" + max_type
-      if self.send(max_setting).blank?
-        max_num = GetSetting.send(max_setting, self.location) || 0
-        self.write_attribute(max_setting, max_num)
+      max_setting = 'max_' + max_type
+      if send(max_setting).blank?
+        max_num = GetSetting.send(max_setting, location) || 0
+        write_attribute(max_setting, max_num)
       end
     end
   end
@@ -165,33 +171,33 @@ class Event < ApplicationRecord
     @notice = ''
 
     case event_format
-    when "Physical"
+    when 'Physical'
       if max_virtual >= 0
         self.max_virtual = 0
-        @notice << "Changed Maximum Virtual Participants to 0. "
+        @notice << 'Changed Maximum Virtual Participants to 0. '
       end
       if max_participants == 0
-        self.max_participants = GetSetting.max_participants(self.location)
+        self.max_participants = GetSetting.max_participants(location)
         @notice << "Changed Maximum Participants to #{max_participants}."
       end
 
-    when "Hybrid"
+    when 'Hybrid'
       if max_participants == 0
-        self.max_participants = GetSetting.max_participants(self.location)
+        self.max_participants = GetSetting.max_participants(location)
         @notice << "Changed Maximum Participants to #{max_participants}. "
       end
       if max_virtual == 0
-        self.max_virtual = GetSetting.max_virtual(self.location)
+        self.max_virtual = GetSetting.max_virtual(location)
         @notice << "Changed Maximum Virtual Participants to #{max_virtual}."
       end
 
-    when "Online"
+    when 'Online'
       if max_participants > 0
         self.max_participants = 0
-        @notice << "Changed Maximum Participants to 0. "
+        @notice << 'Changed Maximum Participants to 0. '
       end
       if max_virtual == 0
-        self.max_virtual = GetSetting.max_virtual(self.location)
+        self.max_virtual = GetSetting.max_virtual(location)
         @notice << "Changed Maximum Virtual Participants to #{max_virtual}."
       end
     end

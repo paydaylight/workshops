@@ -104,6 +104,18 @@ class Membership < ApplicationRecord
     role.include?('Observer')
   end
 
+  def in_person?
+    IN_PERSON_ROLES.include?(role)
+  end
+
+  def confirmed?
+    attendance == 'Confirmed'
+  end
+
+  def attendance_requires_confirmation?
+    confirmed? && in_person? && event.hybrid_or_physical?
+  end
+
   private
 
   def set_billing

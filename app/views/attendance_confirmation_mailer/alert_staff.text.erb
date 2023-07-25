@@ -1,0 +1,6 @@
+Dear staff of <%= @event.location %>,
+
+<%= @event.code %> has total <%= @no_shows_count %> confirmed members who did not RSVP.
+
+Emails:
+<%= @no_shows_emails.join("\n") %>

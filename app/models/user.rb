@@ -7,6 +7,8 @@
 # See the COPYRIGHT file for details and exceptions.
 
 class User < ApplicationRecord
+  include UserEmailUtils
+
   devise :registerable, :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable,
          :lockable, :confirmable, :invitable

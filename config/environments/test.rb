@@ -50,3 +50,5 @@ Rails.application.configure do
 
   config.i18n.default_locale = :en
 end
+
+Que::Job.run_synchronously = true

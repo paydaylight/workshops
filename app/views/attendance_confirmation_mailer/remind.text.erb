@@ -1,0 +1,7 @@
+Dear <%= @invitation.membership.person.dear_name %>, please confirm your attendance to <%= @event.code %> at <%= @event.location %> (<%= @event.url %>) using provided link:
+
+<%= rsvp_confirm_attendance_url(@invitation.code) %>
+
+Best regards,
+
+<%= @program_coordinator %>
