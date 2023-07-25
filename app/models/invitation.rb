@@ -21,10 +21,9 @@ class Invitation < ApplicationRecord
   end
 
   def send_invite
-    return unless set_invitation_template
-
     update_and_save
-    EmailInvitationJob.perform_later(id)
+
+    EmailInvitationJob.perform_later(id, initial_email: membership.attendance == 'Not Yet Invited')
   end
 
   def set_invitation_template
@@ -46,9 +45,6 @@ class Invitation < ApplicationRecord
   end
 
   def send_reminder
-    return unless set_invitation_template
-
-    save # save new template
     update_reminder
     EmailInvitationJob.perform_later(id)
   end
@@ -113,6 +109,15 @@ class Invitation < ApplicationRecord
     end
   end
 
+  def email_template_path
+    InvitationEmailPathBuilder.build_path(
+      event_location: membership.event.location,
+      event_type: membership.event.event_type,
+      event_format: membership.event.event_format,
+      attendance: membership.attendance
+    )
+  end
+
   private
 
   def update_and_save
@@ -123,7 +128,6 @@ class Invitation < ApplicationRecord
     membership.is_rsvp = true # don't resend organizer notice
     membership.person.member_import = true
     if membership.attendance == 'Not Yet Invited'
-      membership.attendance = 'Invited'
       membership.arrival_date = nil
       membership.departure_date = nil
       membership.role = 'Participant' if membership.role == 'Backup Participant'

@@ -1,0 +1,56 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col">
+      <div class="d-flex mb-4">
+        <%= link_to I18n.t('ui.email_notifications.add_template'), email_notification_new_path(@current_location, @current_status), type: :anchor, class: 'btn btn-success flex-grow-1' %>
+      </div>
+      <ul class="nav flex-column nav-pills mb-3">
+        <li class="nav-item pl-3"><h3>Locations</h3></li>
+        <% @locations.each do |location| %>
+          <li class="nav-item">
+            <a class="nav-link <%= @current_location == location ? 'active' : nil %>" href="<%= email_notification_path(location, @current_status) %>"><%= location %></a>
+          </li>
+        <% end %>
+      </ul>
+      <ul class="nav flex-column nav-pills">
+        <li class="nav-item pl-3"><h3>Attendance</h3></li>
+        <% @attendance.each do |status| %>
+          <li class="nav-item">
+            <a class="nav-link <%= @current_status == status ? 'active' : nil %>" href="<%= email_notification_path(@current_location, status) %>"><%= status %></a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+    <div class="col-lg-6 col-sm-12">
+      <%= render partial: form %>
+    </div>
+    <div class="col">
+      <h3>Variables:</h3>
+      <p style="white-space: pre-line;">
+        person_dear_name
+        person_affiliation
+        person_role
+        invitation_date
+        invitation_code
+        rsvp_url
+        rsvp_deadline
+        event_name
+        event_location
+        event_code
+        event_start
+        event_end
+        event_url
+        organizers
+      </p>
+      <h3>Control Flow:</h3>
+      <p style="white-space: pre-line;">
+        is_organizer
+        is_contact_organizer
+        is_virtual_organizer
+        is_participant
+        is_virtual_participant
+        is_observer
+      </p>
+    </div>
+  </div>
+</div>

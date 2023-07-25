@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ./app/services/invitation_email_recipients.rb
 # Copyright (c) 2021 Banff International Research Station.
 # This file is part of Workshops. Workshops is licensed under
@@ -11,6 +13,9 @@ class InvitationEmailRecipients
   end
 
   def development_environment?
+    # TODO: setup a proper staging env
+    return false if @invitation.event.code.include?('666')
+
     Rails.env.development? || ENV['APPLICATION_HOST'].include?('staging')
   end
 

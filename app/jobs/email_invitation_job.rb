@@ -10,8 +10,10 @@
 class EmailInvitationJob < ApplicationJob
   queue_as :urgent
 
-  def perform(invitation_id)
+  def perform(invitation_id, initial_email: false)
     invitation = Invitation.find_by_id(invitation_id)
     InvitationMailer.invite(invitation).deliver_now
+
+    invitation.membership.update_attribute(:attendance, 'Invited') if initial_email
   end
 end
